@@ -30,6 +30,7 @@ VITE_SONG_ID=                       # 资源 ID
 # --- 备案与合规 ---
 VITE_ICP=浙ICP备XXXXXXXX号          # 网站备案号
 ```
+
 ## 🚀 部署说明 (Cloudflare Pages)
 
 ### 1. 基础部署流程
@@ -53,7 +54,7 @@ VITE_ICP=浙ICP备XXXXXXXX号          # 网站备案号
 
 | API 地址                                       | 用途描述                        |
 |:---------------------------------------------|:----------------------------|
-| `http://ip-api.com/json/`                    | 获取用户实时 IP、地理位置及经纬度          |
+| `https://ipapi.co/json/`                     | 获取用户实时 IP、地理位置及经纬度          |
 | `https://v1.hitokoto.cn/`                    | 一言 (Hitokoto) - 首页随机励志/文学句子 |
 | `https://api.injahow.cn/meting/`             | 音乐                          |
 | `https://api.dicebear.com/7.x/avataaars/svg` | 头像                          |
