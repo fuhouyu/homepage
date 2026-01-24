@@ -2,6 +2,7 @@
 
 基于 **React** + **Vite** + **Ant Design** 的个人主页。
 
+**🚀 [演示地址](https://fuhouyu.com)**
 ---
 
 ## ⚙️ 环境变量配置
@@ -29,7 +30,6 @@ VITE_SONG_ID=                       # 资源 ID
 # --- 备案与合规 ---
 VITE_ICP=浙ICP备XXXXXXXX号          # 网站备案号
 ```
-
 ## 🚀 部署说明 (Cloudflare Pages)
 
 ### 1. 基础部署流程
