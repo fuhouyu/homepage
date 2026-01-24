@@ -1,0 +1,33 @@
+{
+  "compilerOptions": {
+    /* 路径与基础设置 */
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* ECMAScript 目标与模块系统 */
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "Bundler", // ✅ 最适合 Vite 的解析模式
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "resolveJsonModule": true,
+
+    /* React 相关 */
+    "jsx": "react-jsx", // ✅ React 17+ 推荐写法（支持 React 19）
+    "types": ["vite/client"], // ✅ 不需要显式加 node（Vite 已包含）
+
+    /* 类型检查与兼容性 */
+    "strict": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "isolatedModules": true,
+    "noEmit": true,
+
+    /* 性能与安全 */
+    "allowJs": false
+  },
+  "include": ["src", "vite.config.ts"]
+}
