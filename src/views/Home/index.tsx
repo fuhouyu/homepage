@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      https://www.apache.org/licenses/LICENSE-2.0
+ * https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -26,12 +26,17 @@ import { Search } from '@/components/Search';
 
 export const Home = () => {
   const username = import.meta.env.VITE_GITHUB_USERNAME;
+
   return (
-    <Flex vertical gap={20} align="center" style={{ width: '100%', position: 'relative' }}>
-      {/* 搜索区域：限制高度，防止遮挡下方 */}
-      <Search />
+    <Flex vertical align="center" style={{ width: '100%', position: 'relative' }}>
       <GridContainer>
-        {/* 左侧区域：用户信息 + 日历 */}
+        {/* 1. 将 Search 放入 GridContainer 内部 */}
+        {/* 通过 style 让它横跨整行 (grid-column: 1 / -1) 从而与容器同宽 */}
+        <div style={{ gridColumn: '1 / -1', width: '100%' }}>
+          <Search />
+        </div>
+
+        {/* 2. 左侧区域：用户信息 + 日历 */}
         <LeftMainCard>
           <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.01}>
             <Userinfo />
@@ -49,8 +54,8 @@ export const Home = () => {
           </CalendarBox>
         </LeftMainCard>
 
-        {/* 右侧区域：时钟 + 一言 */}
-        <Flex vertical gap={25}>
+        {/* 3. 右侧区域：时钟 + 一言 */}
+        <Flex vertical gap={25} style={{ height: '100%' }}>
           <Tilt
             tiltMaxAngleX={10}
             tiltMaxAngleY={10}

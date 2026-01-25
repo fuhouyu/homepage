@@ -14,27 +14,62 @@
  * limitations under the License.
  */
 import React, { useState } from 'react';
-import { SearchOutlined } from '@ant-design/icons';
-import { Input } from 'antd';
+import { Input, Select } from 'antd';
+import { BaiduOutlined, GlobalOutlined, GoogleOutlined, SearchOutlined } from '@ant-design/icons';
 import { SearchWrapper } from '@/components/Search/sytle';
 
 export const Search: React.FC = () => {
   const [keyword, setKeyword] = useState('');
+  const [engine, setEngine] = useState('https://www.bing.com/search?q=');
 
   const handleSearch = () => {
     if (!keyword.trim()) return;
-    window.open(
-      `https://www.bing.com/search?q=${encodeURIComponent(keyword.trim())}%20-CSDN`,
-      '_blank',
-    );
+    // 保持你原来的 -CSDN 逻辑
+    window.open(`${engine}${encodeURIComponent(keyword.trim())}%20-CSDN`, '_blank');
     setKeyword('');
   };
 
   return (
     <SearchWrapper>
       <Input
-        prefix={<SearchOutlined onClick={handleSearch} />}
-        placeholder="必应搜索..."
+        prefix={
+          <Select
+            value={engine}
+            onChange={(val) => setEngine(val)}
+            variant="borderless"
+            onClick={(e) => e.stopPropagation()}
+            getPopupContainer={(triggerNode) => triggerNode.parentNode}
+            // 宽度调小一点更精致，颜色直接写死你想要的淡紫色
+            options={[
+              {
+                label: (
+                  <span className={'select-label'}>
+                    <GlobalOutlined className={'icon'} /> 必应
+                  </span>
+                ),
+                value: 'https://www.bing.com/search?q=',
+              },
+              {
+                label: (
+                  <span className={'select-label'}>
+                    <GoogleOutlined className={'icon'} /> 谷歌
+                  </span>
+                ),
+                value: 'https://www.google.com/search?q=',
+              },
+              {
+                label: (
+                  <span className={'select-label'}>
+                    <BaiduOutlined className={'icon'} /> 百度
+                  </span>
+                ),
+                value: 'https://www.baidu.com/s?wd=',
+              },
+            ]}
+          />
+        }
+        suffix={<SearchOutlined className={'icon'} onClick={handleSearch} />}
+        placeholder="输入关键词搜索..."
         allowClear
         variant="borderless"
         value={keyword}

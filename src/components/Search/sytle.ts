@@ -22,59 +22,79 @@ export const SearchWrapper = styled.div`
   background: rgba(255, 255, 255, 0.05);
   border: 1px solid rgba(255, 255, 255, 0.15);
   border-radius: 24px;
-  padding: 0 16px;
+  padding: 0 0.5rem;
   transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   backdrop-filter: blur(12px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
 
   width: 100%;
-  max-width: 400px; /* 平时缩窄，显得精致 */
-  height: 40px;
-  margin: 0 auto;
-  pointer-events: auto;
+  height: 2.5rem;
+  position: relative;
+  overflow: visible !important;
+  z-index: 100;
 
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.3);
-    max-width: 440px;
+  .ant-select-dropdown {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.15);
   }
 
-  &:focus-within {
-    background: rgba(255, 255, 255, 0.15);
-    border-color: #00f2fe;
-    max-width: 600px; /* 只有输入时才变长 */
-    box-shadow: 0 8px 32px rgba(0, 242, 254, 0.15);
+  .ant-select-item-option-selected {
+    background-color: #180e0d !important;
   }
 
-  .ant-input-affix-wrapper {
-    background: transparent !important;
-    border: none !important;
-    padding: 0 !important;
+  .icon {
+    color: #fff !important;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
-    input {
-      color: #fff !important;
-      font-size: 14px;
-      letter-spacing: 0.5px;
-
-      &::placeholder {
-        color: rgba(255, 255, 255, 0.3) !important;
-        transition: opacity 0.3s;
-      }
+    &:hover {
+      color: #d8b4fe !important; /* 悬停时变为淡紫色 */
+      transform: scale(1.1); /* 增加一点缩放动画 */
     }
 
-    /* 搜索图标稍微调小，显得精致 */
-    .ant-input-prefix {
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 16px;
-      margin-right: 10px;
+    &:active {
+      transform: scale(0.9);
+    }
+  }
+
+  & .search-select-popup {
+    background-color: #0f0e12 !important; /* 强制设为深色 */
+    border: 1px solid rgba(216, 180, 254, 0.3) !important;
+
+    /* 覆盖 antd 默认的白色背景 */
+
+    .ant-select-content {
+      background-color: #0f0e12 !important;
     }
 
-    /* 清除图标 */
-    .ant-input-clear-icon {
-      color: rgba(255, 255, 255, 0.3) !important;
+    .ant-select-item {
+      background-color: transparent !important;
+      color: #fff !important; /* 选项文字改为白色保证清晰 */
+
       &:hover {
-        color: #fff !important;
+        background: rgba(216, 180, 254, 0.1) !important;
       }
     }
+
+    .ant-select-item-option-selected {
+      background: rgba(216, 180, 254, 0.2) !important;
+      color: #d8b4fe !important;
+    }
+  }
+
+  .ant-select-selection-item .anticon {
+    margin-right: 8px;
+    font-size: 16px;
+  }
+
+  .select-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
   }
 `;
