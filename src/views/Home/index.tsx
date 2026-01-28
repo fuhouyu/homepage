@@ -23,6 +23,7 @@ import { PoemCard } from '@/components/PoemCard';
 import { ClockCard } from '@/components/ClockCard';
 import { Userinfo } from '@/components/Userinfo';
 import { Search } from '@/components/Search';
+import { NavigationCard } from '@/components/Navigation';
 
 export const Home = () => {
   const username = import.meta.env.VITE_GITHUB_USERNAME;
@@ -30,13 +31,11 @@ export const Home = () => {
   return (
     <Flex vertical align="center" style={{ width: '100%', position: 'relative' }}>
       <GridContainer>
-        {/* 1. 将 Search 放入 GridContainer 内部 */}
-        {/* 通过 style 让它横跨整行 (grid-column: 1 / -1) 从而与容器同宽 */}
         <div style={{ gridColumn: '1 / -1', width: '100%' }}>
           <Search />
         </div>
 
-        {/* 2. 左侧区域：用户信息 + 日历 */}
+        {/* 左侧区域：用户信息 + 日历 */}
         <LeftMainCard>
           <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.01}>
             <Userinfo />
@@ -54,7 +53,7 @@ export const Home = () => {
           </CalendarBox>
         </LeftMainCard>
 
-        {/* 3. 右侧区域：时钟 + 一言 */}
+        {/* 右侧区域：时钟 + 一言 */}
         <Flex vertical gap={25} style={{ height: '100%' }}>
           <Tilt
             tiltMaxAngleX={10}
@@ -78,6 +77,10 @@ export const Home = () => {
             <PoemCard />
           </Tilt>
         </Flex>
+
+        <div style={{ gridColumn: '1 / -1', width: '100%', marginTop: '.5rem' }}>
+          <NavigationCard />
+        </div>
       </GridContainer>
     </Flex>
   );
