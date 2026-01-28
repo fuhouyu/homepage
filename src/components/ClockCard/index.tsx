@@ -28,7 +28,7 @@ export const ClockCard = ({
 
   // 时钟逻辑
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
+    const timer = setInterval(() => setTime(new Date()), 500);
     return () => clearInterval(timer);
   }, []);
 
@@ -40,10 +40,15 @@ export const ClockCard = ({
             .toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
             .replace(/\//g, '年')
             .replace(/月(\d{2})$/, '月$1日')}
-          {' ' + ['周日', '周1', '周2', '周3', '周4', '周5', '周6'][time.getDay()]}
+          {' ' + ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][time.getDay()]}
         </div>
         <div className="time">
-          {time.toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit' })}
+          {time.toLocaleTimeString('zh-CN', {
+            hour12: false,
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+          })}
         </div>
       </TimeSection>
       <Divider />
