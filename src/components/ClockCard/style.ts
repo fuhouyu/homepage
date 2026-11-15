@@ -14,37 +14,44 @@
  * limitations under the License.
  */
 import styled from 'styled-components';
-import { GlassCard } from '@/layouts/style';
+import { SurfaceCard } from '@/styles/style';
 
-export const ClockContainer = styled(GlassCard)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  padding: 20px;
-`;
-
-export const TimeSection = styled.div`
-  text-align: center;
-
-  .date {
-    font-size: 0.9rem;
-    opacity: 0.7;
-    letter-spacing: 1px;
-  }
-
-  .time {
-    font-size: 3rem;
-    font-weight: bold;
-    font-family: 'monospace';
-    margin-top: 5px;
+export const ClockCardStyled = styled(SurfaceCard)`
+  .ant-card-body {
+    display: flex;
+    flex-direction: column;
   }
 `;
 
-// 分割线
-export const Divider = styled.div`
-  width: 80%;
+export const ClockTime = styled.div`
+  font-size: 46px;
+  line-height: 1.05;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--app-text);
+  font-variant-numeric: tabular-nums;
+
+  .seconds {
+    margin-left: 6px;
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0;
+    color: var(--app-text-faint);
+  }
+
+  @media (max-width: 768px) {
+    font-size: 40px;
+  }
+`;
+
+export const ClockDate = styled.div`
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--app-text-muted);
+`;
+
+export const SoftDivider = styled.div`
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  margin: auto 0 14px;
+  background: var(--app-border);
 `;

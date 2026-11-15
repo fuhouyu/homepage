@@ -13,71 +13,62 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { LoadingScreen, MainLayout, StyledContent, StyledLayout } from './style';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
+import { Backdrop, MainLayout, PageShell, StyledContent, StyledLayout } from './style';
 import { LayoutFooter } from '@/layouts/components/Footer';
 import { LayoutHeader } from '@/layouts/components/Header';
 import { LyricProvider } from '@/context/LyricContext';
+import { useAppTheme } from '@/context/AppThemeContext';
 import { Home } from '@/views/Home';
+import { fetchJson } from '@/utils/request';
+import siteConfig from '@/assets/site-config.json';
+
+interface WallpaperResponse {
+  url?: string;
+}
 
 export const LayoutMain = () => {
-  const [bgUrl, setBgUrl] = useState<string>('');
-  const [isLoading, setIsLoading] = useState(true);
+  const { mode } = useAppTheme();
+  const [wallpaper, setWallpaper] = useState('');
 
   useEffect(() => {
-    // 创建一个至少执行 1500ms 的 Promise
-    const timerPromise = new Promise((resolve) => setTimeout(resolve, 1000));
+    if (mode !== 'scene' || wallpaper) return;
 
-    // 获取 Bing 背景图的 Promise
-    const fetchPromise = fetch('https://bing.biturl.top/?resolution=1920&format=json&index=0')
-      .then((res) => res.json())
+    let cancelled = false;
+    const api = import.meta.env.VITE_WALLPAPER_API || siteConfig.apis.wallpaper;
+
+    fetchJson<WallpaperResponse>(api)
       .then((data) => {
-        return new Promise((resolve) => {
-          const img = new Image();
-          img.src = data.url;
-          img.onload = () => {
-            setBgUrl(data.url);
-            resolve(data.url);
-          };
-        });
+        if (!data?.url) return;
+        const image = new Image();
+        image.onload = () => {
+          if (!cancelled) setWallpaper(data.url as string);
+        };
+        image.src = data.url;
+      })
+      .catch(() => {
+        // 壁纸接口失败时保持纯色背景，首屏不依赖任何外部请求
       });
 
-    // 只有当图片加载完 且 1.5秒定时器结束后，才关闭 Loading
-    Promise.all([fetchPromise, timerPromise]).then(() => {
-      setIsLoading(false);
-    });
-  }, []);
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, wallpaper]);
 
   return (
-    <>
-      <LoadingScreen $isVisible={isLoading}>
-        <div className="loader-container">
-          <div className="outer-ring" />
-          <div className="middle-ring" />
-          <div className="inner-ring" />
-        </div>
-
-        <div className="text-area">
-          <div className="main-title">{import.meta.env.VITE_GITHUB_USERNAME} 的主页</div>
-          <div className="sub-title">加载中...</div>
-        </div>
-      </LoadingScreen>
-
+    <PageShell>
+      <Backdrop $url={wallpaper} $visible={mode === 'scene' && Boolean(wallpaper)} />
       <LyricProvider>
-        {bgUrl && (
-          <StyledLayout $bg={bgUrl}>
-            <LayoutHeader />
-
-            <MainLayout>
-              <StyledContent>
-                <Home />
-              </StyledContent>
-            </MainLayout>
-
-            <LayoutFooter />
-          </StyledLayout>
-        )}
+        <StyledLayout>
+          <LayoutHeader />
+          <MainLayout>
+            <StyledContent>
+              <Home />
+            </StyledContent>
+          </MainLayout>
+          <LayoutFooter />
+        </StyledLayout>
       </LyricProvider>
-    </>
+    </PageShell>
   );
 };

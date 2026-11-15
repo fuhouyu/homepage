@@ -1,0 +1,43 @@
+{
+  "pasteUrl": "https://paste.fuhouyu.com",
+  "weather": {
+    "city": "杭州",
+    "latitude": 30.2741,
+    "longitude": 120.1551,
+    "timezone": "Asia/Shanghai"
+  },
+  "dailyQuote": {
+    "title": "每日一言 · QUOTE OF THE DAY",
+    "api": ""
+  },
+  "apis": {
+    "weather": "https://api.open-meteo.com/v1/forecast",
+    "wallpaper": "https://bing.biturl.top/?resolution=1920&format=json&index=0"
+  },
+  "searchEngines": [
+    { "name": "必应", "icon": "GlobalOutlined", "url": "https://www.bing.com/search?q=", "suffix": "-CSDN" },
+    { "name": "谷歌", "icon": "GoogleOutlined", "url": "https://www.google.com/search?q=" },
+    { "name": "百度", "icon": "BaiduOutlined", "url": "https://www.baidu.com/s?wd=" },
+    { "name": "DuckDuckGo", "icon": "CompassOutlined", "url": "https://duckduckgo.com/?q=" }
+  ],
+  "navigation": [
+    {
+      "title": "我的",
+      "items": [
+        { "name": "Paste", "url": "https://paste.fuhouyu.com", "envKey": "paste", "icon": "FileTextOutlined", "desc": "片段 / 文本暂存", "tone": "#2F7A63" },
+        { "name": "GitHub", "url": "https://github.com/fuhouyu", "envKey": "github", "icon": "GithubOutlined", "desc": "个人主页", "tone": "#5A6472" },
+        { "name": "邮箱", "url": "mailto:fuhouyu@live.cn", "envKey": "email", "icon": "MailOutlined", "desc": "联系我", "tone": "#3B7DE0" }
+      ]
+    },
+    {
+      "title": "常去",
+      "items": [
+        { "name": "BiliBili", "url": "https://www.bilibili.com", "icon": "BilibiliOutlined", "desc": "视频", "tone": "#E8618C" },
+        { "name": "网易云音乐", "url": "https://music.163.com", "icon": "CustomerServiceOutlined", "desc": "听歌", "tone": "#D95050" },
+        { "name": "知乎", "url": "https://www.zhihu.com", "icon": "ZhihuOutlined", "desc": "问答", "tone": "#3B7DE0" },
+        { "name": "Cloudflare", "url": "https://dash.cloudflare.com", "icon": "CloudOutlined", "desc": "控制台", "tone": "#D98A2B" },
+        { "name": "MDN", "url": "https://developer.mozilla.org", "icon": "CodeOutlined", "desc": "Web 文档", "tone": "#8A63D2" }
+      ]
+    }
+  ]
+}

@@ -14,20 +14,35 @@
  * limitations under the License.
  */
 interface ImportMetaEnv {
-  // github 用户名
+  // 站点 SEO
+  readonly VITE_SITE_NAME: string;
+  readonly VITE_SITE_KEYWORDS: string;
+  readonly VITE_SITE_DES: string;
+  readonly VITE_SITE_AUTHOR: string;
   readonly VITE_GITHUB_USERNAME: string;
-  // 城市
   readonly VITE_CITY: string;
-  // email
   readonly VITE_EMAIL: string;
-  // 歌曲配置
+
+  // 站点入口
+  readonly VITE_PASTE_URL: string;
+
+  // 天气
+  readonly VITE_WEATHER_API: string;
+  readonly VITE_WEATHER_CITY: string;
+  readonly VITE_WEATHER_LAT: string;
+  readonly VITE_WEATHER_LON: string;
+  readonly VITE_WEATHER_TZ: string;
+
+  // 聚合数据源
+  readonly VITE_DAILY_QUOTE_API: string;
+  readonly VITE_WALLPAPER_API: string;
+
+  // 音乐配置
   readonly VITE_SONG_API: string;
-  // 数据源
   readonly VITE_SONG_SERVER: string;
-  // 歌曲类型
   readonly VITE_SONG_TYPE: string;
-  // 歌曲id
   readonly VITE_SONG_ID: string;
+
   // 备案号
   readonly VITE_ICP: string;
 }

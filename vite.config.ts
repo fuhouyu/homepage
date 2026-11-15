@@ -5,7 +5,6 @@ import path from 'path';
 import { createHtmlPlugin } from 'vite-plugin-html';
 
 export default ({ mode }: { mode: string }) => {
-  // 加载 .env.dev 文件
   const env = loadEnv(mode, process.cwd(), '');
 
   const isDev = mode === 'dev';
@@ -20,8 +19,10 @@ export default ({ mode }: { mode: string }) => {
     createHtmlPlugin({
       inject: {
         data: {
-          // 将环境变量映射给 HTML 模板
-          VITE_SITE_NAME: env.VITE_SITE_NAME,
+          VITE_SITE_NAME: env.VITE_SITE_NAME || '',
+          VITE_SITE_DES: env.VITE_SITE_DES || '',
+          VITE_SITE_KEYWORDS: env.VITE_SITE_KEYWORDS || '',
+          VITE_SITE_AUTHOR: env.VITE_SITE_AUTHOR || '',
         },
       },
     }),
@@ -32,19 +33,6 @@ export default ({ mode }: { mode: string }) => {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, 'src'),
-      },
-    },
-    css: {
-      preprocessorOptions: {
-        less: {
-          javascriptEnabled: true,
-          modifyVars: {
-            'primary-color': '#1677ff',
-          },
-        },
-        scss: {
-          additionalData: '@use "@/styles/public" as *;', // 全局 SCSS
-        },
       },
     },
     base: env.VITE_SECONDARY_PATH || '/',

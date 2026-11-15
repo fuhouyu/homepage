@@ -13,46 +13,48 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React, { useEffect, useState } from 'react';
-import { ClockContainer, Divider, TimeSection } from './style';
+import { useEffect, useState } from 'react';
+import { CardTitle, SectionLabel } from '@/styles/style';
+import { ClockCardStyled, ClockDate, ClockTime, SoftDivider } from './style';
 import { Music } from '@/components/Music';
 
-export const ClockCard = ({
-  onTimeUpdate,
-  onSongChange,
-}: {
-  onTimeUpdate?: (time: number) => void;
-  onSongChange?: (lrcUrl: string) => void;
-}) => {
-  const [time, setTime] = useState(new Date());
+const formatDate = (date: Date) =>
+  `${new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  }).format(date)} · ${['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()]}`;
 
-  // 时钟逻辑
+export const ClockCard = () => {
+  const [now, setNow] = useState(() => new Date());
+
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 500);
-    return () => clearInterval(timer);
+    const timer = window.setInterval(() => setNow(new Date()), 1000);
+    return () => window.clearInterval(timer);
   }, []);
 
+  const hourMinute = now.toLocaleTimeString('zh-CN', {
+    hour12: false,
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+  const seconds = String(now.getSeconds()).padStart(2, '0');
+
   return (
-    <ClockContainer>
-      <TimeSection>
-        <div className="date">
-          {time
-            .toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' })
-            .replace(/\//g, '年')
-            .replace(/月(\d{2})$/, '月$1日')}
-          {' ' + ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][time.getDay()]}
-        </div>
-        <div className="time">
-          {time.toLocaleTimeString('zh-CN', {
-            hour12: false,
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-          })}
-        </div>
-      </TimeSection>
-      <Divider />
-      <Music onSongChange={onSongChange} onTimeUpdate={onTimeUpdate} />
-    </ClockContainer>
+    <ClockCardStyled variant="borderless">
+      <CardTitle>
+        <SectionLabel>时间 · CLOCK</SectionLabel>
+        <span style={{ fontSize: 11, color: 'var(--app-text-faint)' }}>本地</span>
+      </CardTitle>
+
+      <ClockTime>
+        {hourMinute}
+        <span className="seconds">:{seconds}</span>
+      </ClockTime>
+      <ClockDate>{formatDate(now)}</ClockDate>
+
+      <SoftDivider />
+      <Music />
+    </ClockCardStyled>
   );
 };

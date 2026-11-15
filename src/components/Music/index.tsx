@@ -13,152 +13,164 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { PauseCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Button, Tooltip } from 'antd';
+import {
+  CustomerServiceOutlined,
+  PauseCircleOutlined,
+  PlayCircleOutlined,
+  StepForwardOutlined,
+} from '@ant-design/icons';
+import { MiniAlbum, MusicActions, MusicSection, SongInfo } from '@/components/Music/style';
 import { useLyric } from '@/context/LyricContext';
-import { AnyObject } from 'antd/es/_util/type';
-import { MiniAlbum, MusicSection } from '@/components/Music/style';
+import { fetchJson, fetchText } from '@/utils/request';
 
-// 解析 LRC 文本的工具函数
-const parseLrc = (lrcStr: string) => {
-  const lines = lrcStr.split('\n');
-  return lines
-    .map((line) => {
-      const match = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
-      if (match) {
-        return {
-          time: parseInt(match[1]) * 60 + parseFloat(match[2]),
-          text: match[3].trim(),
-        };
-      }
-      return null;
-    })
-    .filter((item) => item !== null) as { time: number; text: string }[];
-};
-
-interface MusicProps {
-  onTimeUpdate?: (time: number) => void;
-  onSongChange?: (lrcUrl: string) => void;
+interface SongResponse {
+  name?: string;
+  artist?: string;
+  url?: string;
+  pic?: string;
+  lrc?: string;
 }
 
-export const Music = ({ onTimeUpdate, onSongChange }: MusicProps) => {
+interface Song {
+  title: string;
+  artist: string;
+  url: string;
+  cover: string;
+}
+
+interface LyricLine {
+  time: number;
+  text: string;
+}
+
+const parseLrc = (lrc: string): LyricLine[] =>
+  lrc
+    .split('\n')
+    .map((line) => {
+      const match = line.match(/\[(\d+):(\d+\.\d+)\](.*)/);
+      if (!match) return null;
+      return {
+        time: parseInt(match[1], 10) * 60 + parseFloat(match[2]),
+        text: match[3].trim(),
+      };
+    })
+    .filter((line): line is LyricLine => line !== null);
+
+export const Music = () => {
   const { setCurrentLrc } = useLyric();
-  const [song, setSong] = useState<AnyObject>();
-  const [lyrics, setLyrics] = useState<{ time: number; text: string }[]>([]);
+  const [song, setSong] = useState<Song | null>(null);
+  const [lyrics, setLyrics] = useState<LyricLine[]>([]);
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
-  // 获取歌词文本的具体逻辑
-  const handleLyricsFetch = useCallback(async (lrcUrl: string) => {
-    if (!lrcUrl) return;
+  const loadLyrics = useCallback(async (url?: string) => {
+    if (!url) {
+      setLyrics([]);
+      return;
+    }
     try {
-      const res = await fetch(lrcUrl);
-      const data = await res.text();
-      const parsed = parseLrc(data);
-      setLyrics(parsed);
-    } catch (e) {
-      console.error('获取歌词失败', e);
+      setLyrics(parseLrc(await fetchText(url)));
+    } catch {
       setLyrics([]);
     }
   }, []);
 
-  // 获取歌曲列表并随机选择
-  const fetchMusic = useCallback(async () => {
-    try {
-      const res = await fetch(
-        `${import.meta.env.VITE_SONG_API}?server=${import.meta.env.VITE_SONG_SERVER}&type=${import.meta.env.VITE_SONG_TYPE}&id=${import.meta.env.VITE_SONG_ID}`,
-      );
-      const list = await res.json();
-      if (Array.isArray(list) && list.length > 0) {
-        const item = list[Math.floor(Math.random() * list.length)];
-        setSong({
-          id: item.id,
-          title: item.name,
-          artist: item.artist,
-          url: item.url,
-          cover: item.pic,
-        });
+  const loadSong = useCallback(async () => {
+    const api = import.meta.env.VITE_SONG_API;
+    if (!api) return;
 
-        // 处理歌词 URL
-        if (item.lrc) {
-          await handleLyricsFetch(item.lrc);
-        }
-
-        setIsPlaying(false);
-        if (onSongChange) onSongChange(item.lrc);
-      }
-    } catch (e) {
-      console.error('音乐加载失败', e);
-    }
-  }, [onSongChange, handleLyricsFetch]);
-
-  useEffect(() => {
-    fetchMusic().then();
-  }, [fetchMusic]);
-
-  // 音频进度监听
-  const handleAudioTimeUpdate = (currentTime: number) => {
-    onTimeUpdate?.(currentTime);
-
-    // 寻找当前时间对应的歌词行
-    const activeLine = lyrics.find((line, index) => {
-      const nextLine = lyrics[index + 1];
-      return currentTime >= line.time && (!nextLine || currentTime < nextLine.time);
+    const params = new URLSearchParams({
+      server: import.meta.env.VITE_SONG_SERVER || 'netease',
+      type: import.meta.env.VITE_SONG_TYPE || 'playlist',
+      id: import.meta.env.VITE_SONG_ID || '',
     });
 
-    if (activeLine) {
-      setCurrentLrc(activeLine.text);
+    try {
+      const list = await fetchJson<SongResponse[]>(`${api}?${params.toString()}`);
+      if (!Array.isArray(list) || list.length === 0) return;
+      const item = list[Math.floor(Math.random() * list.length)];
+      setSong({
+        title: item.name || '未知曲目',
+        artist: item.artist || '未知艺术家',
+        url: item.url || '',
+        cover: item.pic || '',
+      });
+      setIsPlaying(false);
+      setCurrentLrc('');
+      await loadLyrics(item.lrc);
+    } catch {
+      setSong(null);
     }
+  }, [loadLyrics, setCurrentLrc]);
+
+  useEffect(() => {
+    void loadSong();
+  }, [loadSong]);
+
+  const handleTimeUpdate = (currentTime: number) => {
+    const activeLine = lyrics.find(
+      (line, index) =>
+        currentTime >= line.time && (!lyrics[index + 1] || currentTime < lyrics[index + 1].time),
+    );
+    if (activeLine) setCurrentLrc(activeLine.text);
   };
 
-  const togglePlay = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const togglePlay = () => {
     if (!audioRef.current || !song?.url) return;
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
-      audioRef.current
+      void audioRef.current
         .play()
         .then(() => setIsPlaying(true))
-        .catch(console.error);
+        .catch(() => setIsPlaying(false));
     }
   };
 
   return (
-    <MusicSection onClick={togglePlay}>
+    <MusicSection>
       <audio
         ref={audioRef}
-        src={song?.url || null}
+        src={song?.url || undefined}
         crossOrigin="anonymous"
-        onTimeUpdate={(e) => handleAudioTimeUpdate(e.currentTarget.currentTime)}
+        onTimeUpdate={(event) => handleTimeUpdate(event.currentTarget.currentTime)}
         onEnded={() => {
           setIsPlaying(false);
           setCurrentLrc('');
-          fetchMusic().then();
+          void loadSong();
         }}
       />
       <MiniAlbum $isPlaying={isPlaying}>
-        {song?.cover && <img src={song.cover} alt="cover" />}
+        {song?.cover ? <img src={song.cover} alt="cover" /> : <CustomerServiceOutlined />}
       </MiniAlbum>
-      <div style={{ flex: 1, overflow: 'hidden' }}>
-        <div
-          style={{
-            fontSize: '0.85rem',
-            fontWeight: 600,
-            color: '#fff',
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
-        >
-          {song?.title || '正在加载...'}
-        </div>
-        <div style={{ fontSize: '0.7rem', opacity: 0.6, color: '#fff' }}>{song?.artist}</div>
-      </div>
-      <div style={{ fontSize: '20px', opacity: 0.8, color: '#fff' }}>
-        {isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
-      </div>
+
+      <SongInfo>
+        <div className="title">{song?.title || '音乐未配置'}</div>
+        <div className="artist">{song?.artist || '在 .env 中设置 VITE_SONG_* 即可启用'}</div>
+      </SongInfo>
+
+      <MusicActions>
+        <Tooltip title="换一首" arrow={false}>
+          <Button
+            type="text"
+            size="small"
+            icon={<StepForwardOutlined />}
+            onClick={() => void loadSong()}
+            aria-label="换一首"
+          />
+        </Tooltip>
+        <Button
+          type="text"
+          size="small"
+          icon={isPlaying ? <PauseCircleOutlined /> : <PlayCircleOutlined />}
+          onClick={togglePlay}
+          disabled={!song?.url}
+          aria-label={isPlaying ? '暂停' : '播放'}
+        />
+      </MusicActions>
     </MusicSection>
   );
 };

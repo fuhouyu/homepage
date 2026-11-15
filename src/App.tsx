@@ -13,16 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import { useEffect, useState } from 'react';
+import { ConfigProvider } from 'antd';
+import zhCN from 'antd/locale/zh_CN';
 import { GlobalStyle } from '@/styles/style';
 import { LayoutMain } from '@/layouts';
-import GithubCorner from '@/components/GithubCorner';
+import { AppThemeProvider } from '@/context/AppThemeContext';
+import { APP_MODE_STORAGE_KEY, getAntdTheme, type AppMode } from '@/styles/theme';
+
+const readInitialMode = (): AppMode => {
+  try {
+    const saved = window.localStorage.getItem(APP_MODE_STORAGE_KEY);
+    if (saved === 'light' || saved === 'dark' || saved === 'scene') return saved;
+  } catch {
+    // 隐私模式下 localStorage 不可用，直接回退默认主题
+  }
+  return 'light';
+};
 
 export const App = () => {
+  const [mode, setMode] = useState<AppMode>(readInitialMode);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = mode;
+    try {
+      window.localStorage.setItem(APP_MODE_STORAGE_KEY, mode);
+    } catch {
+      // 忽略存储异常
+    }
+  }, [mode]);
+
   return (
-    <>
-      <GlobalStyle />
-      <GithubCorner />
-      <LayoutMain />
-    </>
+    <ConfigProvider locale={zhCN} theme={getAntdTheme(mode)}>
+      <AppThemeProvider mode={mode} setMode={setMode}>
+        <GlobalStyle />
+        <LayoutMain />
+      </AppThemeProvider>
+    </ConfigProvider>
   );
 };

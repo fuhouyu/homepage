@@ -13,31 +13,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { StyledFooter } from '@/layouts/components/style';
+import { FooterShell } from '@/layouts/components/style';
+import siteConfig from '@/assets/site-config.json';
 
 export const LayoutFooter = () => {
-  const currentYear = new Date().getFullYear();
-  const username = import.meta.env.VITE_GITHUB_USERNAME;
+  const year = new Date().getFullYear();
+  const username = import.meta.env.VITE_GITHUB_USERNAME || import.meta.env.VITE_SITE_NAME || '';
+  const email = import.meta.env.VITE_EMAIL;
+  const city = import.meta.env.VITE_CITY;
+  const icp = import.meta.env.VITE_ICP;
+  const pasteUrl = import.meta.env.VITE_PASTE_URL || siteConfig.pasteUrl;
 
   return (
-    <StyledFooter>
-      <div>
-        © {currentYear} <strong>{username}</strong>. All Rights Reserved.
-      </div>
-      <div style={{ display: 'flex', gap: '15px', opacity: 0.6 }}>
-        {import.meta.env.VITE_ICP && (
-          <a
-            href="https://beian.miit.gov.cn/"
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: '#fff' }}
-          >
-            {import.meta.env.VITE_ICP}
+    <FooterShell>
+      <span>
+        © {year} {username}
+        {city ? ` · ${city}` : ''}
+      </span>
+      <div className="footer-links">
+        {icp && (
+          <a href="https://beian.miit.gov.cn/" target="_blank" rel="noreferrer">
+            {icp}
           </a>
         )}
-        <span>Designed by React & AntD</span>
+        <a href={pasteUrl} target="_blank" rel="noreferrer">
+          Paste
+        </a>
+        {username && (
+          <a href={`https://github.com/${username}`} target="_blank" rel="noreferrer">
+            GitHub
+          </a>
+        )}
+        {email && <a href={`mailto:${email}`}>Email</a>}
+        <span>React · Ant Design</span>
       </div>
-    </StyledFooter>
+    </FooterShell>
   );
 };

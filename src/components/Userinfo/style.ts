@@ -14,74 +14,129 @@
  * limitations under the License.
  */
 import styled from 'styled-components';
-import { Avatar, Tag } from 'antd';
+import { SurfaceCard } from '@/styles/style';
 
-// 包装整个 UserInfo 的容器
-export const UserInfoWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 20px;
-`;
-
-// 扩展 Avatar 增加边框质感
-export const StyledAvatar = styled(Avatar)`
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  flex-shrink: 0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-`;
-
-// 内容区（名字 + 标签）
-export const InfoContent = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-// 统一的标签容器
-export const TagGroup = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-top: 8px;
-  flex-wrap: wrap;
-`;
-
-// 扩展 AntD Tag，移除默认边框并增加毛玻璃感
-export const GlassTag = styled(Tag)`
-  border: none !important;
-  color: #fff !important;
-  background: rgba(255, 255, 255, 0.1) !important;
-  padding: 2px 10px !important;
-  display: flex;
-  align-items: center;
-  transition: all 0.3s ease !important;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2) !important;
-    transform: translateY(-2px);
+export const HeroCardStyled = styled(SurfaceCard)`
+  .ant-card-body {
+    padding: 28px 30px;
   }
+
+  @media (max-width: 768px) {
+    .ant-card-body {
+      padding: 22px 18px;
+    }
+  }
+`;
+
+export const HeroLayout = styled.div`
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28px;
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 18px;
+  }
+`;
+
+export const HeroMain = styled.div`
+  min-width: 0;
+  flex: 1;
+`;
+
+export const Greeting = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: var(--app-accent);
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--app-accent);
+  }
+`;
+
+export const MetaRow = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 20px;
+`;
+
+export const MetaPill = styled.a`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--app-border);
+  background: var(--app-surface-soft);
+  color: var(--app-text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 
   .anticon {
-    margin-right: 4px;
+    font-size: 12px;
   }
-`;
-
-export const IconLink = styled.a`
-  display: flex;
-  color: inherit;
-  text-decoration: none;
 
   &:hover {
-    color: #4facfe;
+    color: var(--app-accent);
+    border-color: var(--app-accent);
+    background: var(--app-accent-soft);
   }
 `;
 
-export const GlowText = styled.div`
-  color: white;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+export const HeroDate = styled.div`
+  flex-shrink: 0;
+  min-width: 128px;
+  padding-left: 26px;
+  border-left: 1px solid var(--app-border);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 
-  h1 {
-    font-size: 3rem;
-    font-weight: 800;
-    margin: 0;
-    letter-spacing: -1px;
+  .day {
+    font-size: 46px;
+    line-height: 1;
+    font-weight: 600;
+    letter-spacing: -0.04em;
+    color: var(--app-text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .month {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--app-accent);
+  }
+
+  .week {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--app-text-faint);
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 10px;
+    padding-left: 0;
+    border-left: none;
+    .day {
+      font-size: 30px;
+    }
+    .week {
+      margin-top: 0;
+    }
   }
 `;

@@ -14,87 +14,76 @@
  * limitations under the License.
  */
 import styled from 'styled-components';
+import { SurfaceCard } from '@/styles/style';
 
-export const SearchWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  /* 极致毛玻璃：背景更透，模糊更深 */
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  border-radius: 24px;
-  padding: 0 0.5rem;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-
-  width: 100%;
-  height: 2.5rem;
-  position: relative;
-  overflow: visible !important;
-  z-index: 100;
-
-  .ant-select-dropdown {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-  }
-
-  .ant-select-item-option-selected {
-    background-color: #180e0d !important;
-  }
-
-  .icon {
-    color: #fff !important;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
+export const SearchCard = styled(SurfaceCard)`
+  .ant-card-body {
+    padding: 6px 10px 6px 14px !important;
     display: flex;
     align-items: center;
-    justify-content: center;
-
-    &:hover {
-      color: #d8b4fe !important; /* 悬停时变为淡紫色 */
-      transform: scale(1.1); /* 增加一点缩放动画 */
-    }
-
-    &:active {
-      transform: scale(0.9);
-    }
+    gap: 12px;
   }
 
-  & .search-select-popup {
-    background-color: #0f0e12 !important; /* 强制设为深色 */
-    border: 1px solid rgba(216, 180, 254, 0.3) !important;
-
-    /* 覆盖 antd 默认的白色背景 */
-
-    .ant-select-content {
-      background-color: #0f0e12 !important;
-    }
-
-    .ant-select-item {
-      background-color: transparent !important;
-      color: #fff !important; /* 选项文字改为白色保证清晰 */
-
-      &:hover {
-        background: rgba(216, 180, 254, 0.1) !important;
-      }
-    }
-
-    .ant-select-item-option-selected {
-      background: rgba(216, 180, 254, 0.2) !important;
-      color: #d8b4fe !important;
-    }
+  .ant-input-affix-wrapper {
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 0;
   }
 
-  .ant-select-selection-item .anticon {
-    margin-right: 8px;
-    font-size: 16px;
+  .ant-input {
+    background: transparent !important;
+    color: var(--app-text) !important;
+    font-size: 14px;
+  }
+
+  .ant-input::placeholder {
+    color: var(--app-text-faint) !important;
+  }
+
+  .ant-select-selector {
+    padding-inline-end: 18px !important;
+  }
+
+  .ant-select-selection-item {
+    color: var(--app-text-muted);
+    font-size: 13px;
+  }
+
+  .engine-icon {
+    margin-right: 6px;
+    color: var(--app-accent);
   }
 
   .select-label {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    color: #fff;
+    font-size: 13px;
+    color: var(--app-text-muted);
+  }
+`;
+
+export const SearchHint = styled.span`
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  color: var(--app-text-faint);
+  white-space: nowrap;
+
+  kbd {
+    display: inline-block;
+    min-width: 18px;
+    padding: 1px 5px;
+    border: 1px solid var(--app-border-strong);
+    border-radius: 5px;
+    background: var(--app-surface-soft);
+    color: var(--app-text-muted);
+    font-family: inherit;
+    text-align: center;
+  }
+
+  @media (max-width: 768px) {
+    display: none;
   }
 `;

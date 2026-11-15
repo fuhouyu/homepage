@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * https://www.apache.org/licenses/LICENSE-2.0
+ *      https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,75 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import { Flex } from 'antd';
-import { GitHubCalendar } from 'react-github-calendar';
-import Tilt from 'react-parallax-tilt';
-
-import { CalendarBox, GridContainer, LeftMainCard } from '@/views/Home/style';
-import { PoemCard } from '@/components/PoemCard';
-import { ClockCard } from '@/components/ClockCard';
-import { Userinfo } from '@/components/Userinfo';
+import { FullWidth, PageGrid } from '@/views/Home/style';
+import { HeroCard } from '@/components/Userinfo';
 import { Search } from '@/components/Search';
+import { ClockCard } from '@/components/ClockCard';
+import { WeatherCard } from '@/components/Weather';
 import { NavigationCard } from '@/components/Navigation';
 
-export const Home = () => {
-  const username = import.meta.env.VITE_GITHUB_USERNAME;
+export const Home = () => (
+  <PageGrid>
+    <FullWidth>
+      <HeroCard />
+    </FullWidth>
 
-  return (
-    <Flex vertical align="center" style={{ width: '100%', position: 'relative' }}>
-      <GridContainer>
-        <div style={{ gridColumn: '1 / -1', width: '100%' }}>
-          <Search />
-        </div>
+    <FullWidth>
+      <Search />
+    </FullWidth>
 
-        {/* 左侧区域：用户信息 + 日历 */}
-        <LeftMainCard>
-          <Tilt tiltMaxAngleX={5} tiltMaxAngleY={5} scale={1.01}>
-            <Userinfo />
-          </Tilt>
-          <CalendarBox>
-            <GitHubCalendar
-              username={username}
-              blockSize={11}
-              showTotalCount={false}
-              showColorLegend={false}
-              blockMargin={3}
-              fontSize={12}
-              colorScheme="dark"
-            />
-          </CalendarBox>
-        </LeftMainCard>
+    <ClockCard />
+    <WeatherCard />
 
-        {/* 右侧区域：时钟 + 一言 */}
-        <Flex vertical gap={25} style={{ height: '100%' }}>
-          <Tilt
-            tiltMaxAngleX={10}
-            tiltMaxAngleY={10}
-            scale={1.03}
-            glareEnable={true}
-            glareMaxOpacity={0.15}
-            glareBorderRadius="20px"
-          >
-            <ClockCard />
-          </Tilt>
-
-          <Tilt
-            tiltMaxAngleX={10}
-            tiltMaxAngleY={10}
-            scale={1.03}
-            glareEnable={true}
-            glareMaxOpacity={0.15}
-            glareBorderRadius="20px"
-          >
-            <PoemCard />
-          </Tilt>
-        </Flex>
-
-        <div style={{ gridColumn: '1 / -1', width: '100%', marginTop: '.5rem' }}>
-          <NavigationCard />
-        </div>
-      </GridContainer>
-    </Flex>
-  );
-};
+    <FullWidth>
+      <NavigationCard />
+    </FullWidth>
+  </PageGrid>
+);

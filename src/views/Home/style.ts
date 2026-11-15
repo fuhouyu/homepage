@@ -14,39 +14,20 @@
  * limitations under the License.
  */
 import styled from 'styled-components';
-import { GlassCard } from '@/layouts/style';
 
-export const GridContainer = styled.div`
-  width: 100%;
-  max-width: 75rem;
-  /* 初始桌面端高度限制 */
-  max-height: 80vh;
-
+export const PageGrid = styled.div`
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 1.875rem;
-  align-items: start;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-items: stretch;
 
-  /* 📱 手机端适配 */
   @media (max-width: 768px) {
-    grid-template-columns: 1fr; /* 变成单列 */
-    max-height: none; /* 解除高度限制，允许纵向滚动 */
-    overflow-y: auto; /* 允许内容区滚动 */
-    padding-bottom: 2rem; /* 给底部留点空间 */
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 `;
 
-export const LeftMainCard = styled(GlassCard)`
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-  height: 100%;
-  justify-content: center;
-`;
-
-export const CalendarBox = styled.div`
-  width: 100%;
-  text {
-    color: #fff;
-  }
+export const FullWidth = styled.div`
+  grid-column: 1 / -1;
+  min-width: 0;
 `;

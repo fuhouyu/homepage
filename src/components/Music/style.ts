@@ -13,47 +13,78 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// 音乐内嵌区域
 import styled, { keyframes } from 'styled-components';
 
-// 音乐播放器
-// 旋转动画
 const rotate = keyframes`
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 `;
 
 export const MusicSection = styled.div`
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 0.75rem;
-  cursor: pointer;
-  transition: background 0.3s;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 1px solid var(--app-border);
+  border-radius: 12px;
+  background: var(--app-surface-soft);
+  transition: border-color 0.2s ease;
 
   &:hover {
-    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--app-border-strong);
   }
 `;
 
 export const MiniAlbum = styled.div<{ $isPlaying: boolean }>`
-  width: 2.25rem;
-  height: 2.25rem;
-  position: relative;
+  width: 38px;
+  height: 38px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--app-accent-soft);
+  color: var(--app-accent);
+  font-size: 15px;
 
   img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
-    animation: ${rotate} 8s linear infinite;
+    animation: ${rotate} 12s linear infinite;
     animation-play-state: ${(props) => (props.$isPlaying ? 'running' : 'paused')};
   }
+`;
+
+export const SongInfo = styled.div`
+  flex: 1;
+  min-width: 0;
+
+  .title {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--app-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .artist {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--app-text-faint);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`;
+
+export const MusicActions = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+  color: var(--app-text-muted);
 `;

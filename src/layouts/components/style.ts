@@ -13,79 +13,142 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Footer } from 'antd/es/layout/layout';
 import styled, { keyframes } from 'styled-components';
-import { GlassEffect } from '@/styles/style';
-import { Layout } from 'antd';
-
-// 头
-const pulse = keyframes`
-  0% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.4); }
-  70% { box-shadow: 0 0 0 0.375rem rgba(0, 255, 136, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
-`;
 
 const lyricFadeIn = keyframes`
-  from { opacity: 0; transform: translateY(5px); }
+  from { opacity: 0; transform: translateY(4px); }
   to { opacity: 1; transform: translateY(0); }
 `;
 
-export const StyledHeader = styled(Layout.Header)`
-  height: 3rem;
-  ${GlassEffect(12, 0.25)}
-  color: #fff;
+export const HeaderShell = styled.header`
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 20px 24px 8px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    padding: 14px 14px 6px;
+    gap: 10px;
+  }
 `;
 
-export const StatusDot = styled.div`
-  width: 0.375rem;
-  height: 0.375rem;
-  background: #00ff88;
-  border-radius: 50%;
-  margin-right: 0.5rem;
-  animation: ${pulse} 2s infinite;
+export const Brand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+
+  .brand-name {
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--app-text);
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--app-text-faint);
+    letter-spacing: 0.04em;
+  }
+`;
+
+export const LyricSlot = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 export const LyricText = styled.span`
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.85rem;
-  color: #00f2fe;
+  font-size: 12px;
+  color: var(--app-text-faint);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  animation: ${lyricFadeIn} 0.5s ease-out;
+  animation: ${lyricFadeIn} 0.45s ease-out;
 `;
 
-// 脚
-export const StyledFooter = styled(Footer)`
-  ${GlassEffect(12, 0.25)}
+export const HeaderActions = styled.div`
   display: flex;
-  flex-direction: column;
-  gap: 0.3125rem;
   align-items: center;
-  justify-content: center;
-
-  height: 3.125rem;
+  justify-content: flex-end;
+  gap: 14px;
   flex-shrink: 0;
-  padding: 0 3.125rem;
 
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 0.875rem;
-  z-index: 100;
+  .today {
+    font-size: 12px;
+    color: var(--app-text-muted);
+    white-space: nowrap;
+  }
+
+  .icon-link {
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--app-text-muted);
+    font-size: 16px;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease;
+
+    &:hover {
+      color: var(--app-accent);
+      background: var(--app-accent-soft);
+    }
+  }
 
   @media (max-width: 768px) {
-    flex-direction: column;
-    height: auto;
-    padding: 0.9375rem 1.25rem;
-    gap: 0.5rem;
-    justify-content: center;
+    .today {
+      display: none;
+    }
+  }
+`;
+
+export const FooterShell = styled.footer`
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 12px 24px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--app-text-faint);
+
+  .footer-links {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
   }
 
   a {
-    color: #fff;
-    transition: opacity 0.3s;
+    transition: color 0.2s ease;
     &:hover {
-      opacity: 0.8;
-      color: #00f2fe;
+      color: var(--app-accent);
+    }
+  }
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px 14px 24px;
+    .footer-links {
+      gap: 12px;
     }
   }
 `;

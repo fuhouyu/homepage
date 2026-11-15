@@ -13,49 +13,88 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Tooltip } from 'antd';
-import { EnvironmentOutlined, GithubOutlined, MailOutlined } from '@ant-design/icons';
-import { GlassTag, GlowText, IconLink, InfoContent, StyledAvatar, TagGroup, UserInfoWrapper, } from './style';
+import {
+  EnvironmentOutlined,
+  FileTextOutlined,
+  GithubOutlined,
+  MailOutlined,
+} from '@ant-design/icons';
+import {
+  Greeting,
+  HeroCardStyled,
+  HeroDate,
+  HeroLayout,
+  HeroMain,
+  MetaPill,
+  MetaRow,
+} from './style';
+import { DailyQuote } from '@/components/DailyQuote';
+import siteConfig from '@/assets/site-config.json';
 
-export const Userinfo = () => {
-  const username = import.meta.env.VITE_GITHUB_USERNAME;
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 6) return '夜深了';
+  if (hour < 11) return '早上好';
+  if (hour < 14) return '中午好';
+  if (hour < 18) return '下午好';
+  return '晚上好';
+};
+
+export const HeroCard = () => {
+  const username = import.meta.env.VITE_GITHUB_USERNAME || import.meta.env.VITE_SITE_NAME || '';
+  const city = import.meta.env.VITE_CITY || siteConfig.weather.city;
   const email = import.meta.env.VITE_EMAIL;
-  const city = import.meta.env.VITE_CITY;
-  // 生成头像 URL
-  const avatarUrl = `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`;
+  const pasteUrl = import.meta.env.VITE_PASTE_URL || siteConfig.pasteUrl;
+
+  const now = new Date();
+  const week = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][now.getDay()];
+  const month = new Intl.DateTimeFormat('en-US', { month: 'short' }).format(now).toUpperCase();
 
   return (
-    <UserInfoWrapper>
-      <StyledAvatar size={80} src={avatarUrl} />
+    <HeroCardStyled variant="borderless">
+      <HeroLayout>
+        <HeroMain>
+          <Greeting>
+            <span className="dot" />
+            {getGreeting()}，欢迎来到 {username || '这里'}
+          </Greeting>
 
-      <InfoContent>
-        <GlowText>
-          <h1 style={{ fontSize: '2.5rem', margin: 0, lineHeight: 1.1 }}>{username}</h1>
-        </GlowText>
+          <DailyQuote />
 
-        <TagGroup>
-          {/* 城市标签 - 纯展示 */}
-          {city && <GlassTag icon={<EnvironmentOutlined />}>{city}</GlassTag>}
+          <MetaRow>
+            {city && (
+              <MetaPill as="span">
+                <EnvironmentOutlined />
+                {city}
+              </MetaPill>
+            )}
+            {email && (
+              <MetaPill href={`mailto:${email}`}>
+                <MailOutlined />
+                Email
+              </MetaPill>
+            )}
+            {username && (
+              <MetaPill href={`https://github.com/${username}`} target="_blank" rel="noreferrer">
+                <GithubOutlined />
+                GitHub
+              </MetaPill>
+            )}
+            <MetaPill href={pasteUrl} target="_blank" rel="noreferrer">
+              <FileTextOutlined />
+              Paste
+            </MetaPill>
+          </MetaRow>
+        </HeroMain>
 
-          {/* GitHub 链接标签 */}
-          {username && (
-            <Tooltip title="GitHub" arrow={false}>
-              <IconLink href={`https://github.com/${username}`} target="_blank" rel="noreferrer">
-                <GlassTag icon={<GithubOutlined />}>Github</GlassTag>
-              </IconLink>
-            </Tooltip>
-          )}
-
-          {/* Email 链接标签 */}
-          {email && (
-            <Tooltip title="Email" arrow={false}>
-              <IconLink href={`mailto:${email}`}>
-                <GlassTag icon={<MailOutlined />}>Email</GlassTag>
-              </IconLink>
-            </Tooltip>
-          )}
-        </TagGroup>
-      </InfoContent>
-    </UserInfoWrapper>
+        <HeroDate>
+          <span className="day">{String(now.getDate()).padStart(2, '0')}</span>
+          <span className="month">
+            {month} · {now.getFullYear()}
+          </span>
+          <span className="week">{week}</span>
+        </HeroDate>
+      </HeroLayout>
+    </HeroCardStyled>
   );
 };
