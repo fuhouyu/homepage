@@ -12,16 +12,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "antd": "^6.2.1",
+    "@tailwindcss/vite": "^4.3.5",
+    "class-variance-authority": "^0.7.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-github-calendar": "^5.0.4",
-    "react-parallax-tilt": "^1.7.316",
-    "styled-components": "^6.3.8",
+    "tailwindcss": "^4.3.5",
     "vite-plugin-html": "^3.2.2"
   },
   "devDependencies": {
-    "@ant-design/icons": "^6.1.0",
     "@eslint/js": "^9.39.1",
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",

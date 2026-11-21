@@ -13,28 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Skeleton } from 'antd';
 import { useEffect, useState } from 'react';
-import { CardTitle, SectionLabel } from '@/styles/style';
-import {
-  MetricRow,
-  WeatherCardStyled,
-  WeatherDesc,
-  WeatherFallback,
-  WeatherIconBox,
-  WeatherTemp,
-  WeatherTop,
-} from './style';
+import { Icon, weatherIcon } from '@/components/Icon';
 import siteConfig from '@/assets/site-config.json';
 import { fetchJson } from '@/utils/request';
 
 interface OpenMeteoResponse {
   current?: {
     temperature_2m: number;
-    relative_humidity_2m: number;
     apparent_temperature: number;
     weather_code: number;
-    wind_speed_10m: number;
   };
   daily?: {
     temperature_2m_max?: number[];
@@ -42,11 +30,9 @@ interface OpenMeteoResponse {
   };
 }
 
-interface WeatherState {
+interface WeatherBrief {
   temperature: number;
-  apparent: number;
-  humidity: number;
-  wind: number;
+  feels: number;
   code: number;
   max: number;
   min: number;
@@ -83,103 +69,8 @@ const WEATHER_TEXT: Record<number, string> = {
   99: '强雷雨伴冰雹',
 };
 
-const getWeatherKind = (code: number) => {
-  if (code <= 1) return 'clear';
-  if (code === 2 || code === 3 || code === 45 || code === 48) return 'cloud';
-  if (code >= 95) return 'thunder';
-  if ((code >= 71 && code <= 77) || code === 85 || code === 86) return 'snow';
-  if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return 'rain';
-  return 'cloud';
-};
-
-const WeatherIcon = ({ code }: { code: number }) => {
-  const kind = getWeatherKind(code);
-  const sun = (
-    <g>
-      <circle cx="26" cy="25" r="8" fill="var(--app-accent)" opacity="0.9" />
-      {[0, 45, 90, 135, 180, 225, 270, 315].map((angle) => (
-        <line
-          key={angle}
-          x1="26"
-          y1="10"
-          x2="26"
-          y2="14"
-          stroke="var(--app-accent)"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          transform={`rotate(${angle} 26 25)`}
-        />
-      ))}
-    </g>
-  );
-  const cloud = (
-    <path
-      d="M16 43 a9 9 0 0 1 2-17 a12 12 0 0 1 23 2 a9 9 0 0 1 5 17 z"
-      fill="var(--app-surface-soft)"
-      stroke="var(--app-accent)"
-      strokeWidth="1.6"
-      strokeLinejoin="round"
-    />
-  );
-
-  return (
-    <svg viewBox="0 0 64 64" width="62" height="62" role="img" aria-label="天气图标">
-      {kind === 'clear' && sun}
-      {kind === 'cloud' && (
-        <>
-          {code <= 3 && <g opacity="0.55">{sun}</g>}
-          {cloud}
-        </>
-      )}
-      {kind === 'rain' && (
-        <>
-          {cloud}
-          <path
-            d="M23 48 l-3 7 M33 48 l-3 7 M43 48 l-3 7"
-            stroke="var(--app-accent)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-          />
-        </>
-      )}
-      {kind === 'snow' && (
-        <>
-          {cloud}
-          <g fill="var(--app-accent)">
-            <circle cx="22" cy="52" r="1.8" />
-            <circle cx="33" cy="54" r="1.8" />
-            <circle cx="44" cy="52" r="1.8" />
-          </g>
-        </>
-      )}
-      {kind === 'thunder' && (
-        <>
-          {cloud}
-          <path
-            d="M34 46 l-7 9 h6 l-3 7"
-            fill="none"
-            stroke="var(--app-accent)"
-            strokeWidth="1.8"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </>
-      )}
-      {code === 45 || code === 48 ? (
-        <path
-          d="M18 50 H48 M22 55 H44"
-          stroke="var(--app-accent)"
-          strokeWidth="1.6"
-          strokeLinecap="round"
-          opacity="0.7"
-        />
-      ) : null}
-    </svg>
-  );
-};
-
-export const WeatherCard = () => {
-  const [weather, setWeather] = useState<WeatherState | null>(null);
+export const Weather = () => {
+  const [weather, setWeather] = useState<WeatherBrief | null>(null);
   const [failed, setFailed] = useState(false);
 
   const city =
@@ -194,8 +85,7 @@ export const WeatherCard = () => {
     const params = new URLSearchParams({
       latitude: String(latitude),
       longitude: String(longitude),
-      current:
-        'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m',
+      current: 'temperature_2m,apparent_temperature,weather_code',
       daily: 'temperature_2m_max,temperature_2m_min',
       timezone,
       forecast_days: '1',
@@ -203,19 +93,18 @@ export const WeatherCard = () => {
 
     fetchJson<OpenMeteoResponse>(`${api}?${params.toString()}`)
       .then((data) => {
-        if (cancelled || !data.current) {
-          if (!cancelled) setFailed(true);
+        if (cancelled) return;
+        if (!data.current) {
+          setFailed(true);
           return;
         }
         const current = data.current;
         setWeather({
-          temperature: current.temperature_2m,
-          apparent: current.apparent_temperature,
-          humidity: current.relative_humidity_2m,
-          wind: current.wind_speed_10m,
+          temperature: Math.round(current.temperature_2m),
+          feels: Math.round(current.apparent_temperature),
           code: current.weather_code,
-          max: data.daily?.temperature_2m_max?.[0] ?? current.temperature_2m,
-          min: data.daily?.temperature_2m_min?.[0] ?? current.temperature_2m,
+          max: Math.round(data.daily?.temperature_2m_max?.[0] ?? current.temperature_2m),
+          min: Math.round(data.daily?.temperature_2m_min?.[0] ?? current.temperature_2m),
         });
       })
       .catch(() => {
@@ -227,53 +116,44 @@ export const WeatherCard = () => {
     };
   }, [api, latitude, longitude, timezone]);
 
-  const round = (value: number) => Math.round(value);
+  const condition = weather ? (WEATHER_TEXT[weather.code] ?? '未知天气') : '';
+  const detail = weather
+    ? `${city} ${weather.temperature}° ${condition}，体感 ${weather.feels}°，今日 ${weather.max}°/${weather.min}°`
+    : failed
+      ? `${city} 天气暂时不可用`
+      : `${city} 天气加载中`;
 
   return (
-    <WeatherCardStyled variant="borderless">
-      <CardTitle>
-        <SectionLabel>天气 · WEATHER</SectionLabel>
-        <span style={{ fontSize: 11, color: 'var(--app-text-faint)' }}>{city}</span>
-      </CardTitle>
+    <section className="flex flex-col gap-1" aria-label={detail}>
+      <h2 className="kicker">
+        {city} · {weather ? condition : failed ? '天气不可用' : '加载中'}
+      </h2>
+
+      <div className="flex items-center gap-3">
+        <Icon
+          name={weather ? weatherIcon(weather.code) : 'cloud'}
+          size={34}
+          strokeWidth={1.5}
+          className="text-accent-ink shrink-0"
+        />
+        {weather ? (
+          <p className="text-figure num text-shadowed font-light text-ink">
+            {weather.temperature}°
+          </p>
+        ) : failed ? (
+          <p className="text-figure num text-shadowed font-light text-faint">—</p>
+        ) : (
+          <i aria-hidden className="skeleton block h-8 w-16 rounded-sm" />
+        )}
+      </div>
 
       {weather ? (
-        <>
-          <WeatherTop>
-            <WeatherTemp>
-              {round(weather.temperature)}
-              <span className="unit">°</span>
-            </WeatherTemp>
-            <WeatherIconBox>
-              <WeatherIcon code={weather.code} />
-            </WeatherIconBox>
-          </WeatherTop>
-          <WeatherDesc>
-            {WEATHER_TEXT[weather.code] ?? '未知天气'} · 体感 {round(weather.apparent)}°
-          </WeatherDesc>
-          <MetricRow>
-            <div className="metric">
-              <div className="metric-label">湿度</div>
-              <div className="metric-value">{round(weather.humidity)}%</div>
-            </div>
-            <div className="metric">
-              <div className="metric-label">风速</div>
-              <div className="metric-value">{round(weather.wind)} km/h</div>
-            </div>
-            <div className="metric">
-              <div className="metric-label">今日</div>
-              <div className="metric-value">
-                {round(weather.max)}° / {round(weather.min)}°
-              </div>
-            </div>
-          </MetricRow>
-        </>
-      ) : failed ? (
-        <WeatherFallback>天气暂时不可用，稍后再看看</WeatherFallback>
-      ) : (
-        <WeatherFallback>
-          <Skeleton active paragraph={{ rows: 2 }} title={false} style={{ width: '100%' }} />
-        </WeatherFallback>
+        <p className="text-shadowed text-meta text-muted" title={detail}>
+          今日 {weather.max}°/{weather.min}° · 体感 {weather.feels}°
+        </p>
+      ) : failed ? null : (
+        <i aria-hidden className="skeleton block h-3 w-36 rounded-sm" />
       )}
-    </WeatherCardStyled>
+    </section>
   );
 };

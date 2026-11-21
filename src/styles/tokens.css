@@ -1,0 +1,873 @@
+/*
+ * Copyright 2026-present fuhouyu.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@import 'tailwindcss';
+
+@custom-variant dark (&:where(html[data-theme='dark'], html[data-theme='dark'] *));
+
+/* ================================================================ ground == */
+/* 版面有三态底，由 data-ground 决定，文字颜色跟着底走：
+   photo = 每日一图满幅（顶/底压暗、中间留图），paper = 纸版，ink = 夜版。
+   三态共用同一套 token 名，组件里不出现 if 底色的判断。 */
+
+:root {
+  --app-bg: #f2f1ea;
+  --app-ink: #101418;
+  --app-muted: #4a525b;
+  --app-faint: #6d767f;
+
+  --app-rule: rgba(16, 20, 24, 0.16);
+  --app-rule-strong: rgba(16, 20, 24, 0.34);
+  --app-surface: rgba(255, 255, 255, 0.72);
+  --app-surface-border: rgba(16, 20, 24, 0.1);
+  --app-blur: blur(6px);
+
+  --app-accent: #b42318;
+  --app-accent-ink: #9c1e14;
+  --app-accent-soft: rgba(180, 35, 24, 0.09);
+  --app-on-accent: #fffaf7;
+
+  --app-shadow-text: none;
+  --app-shadow-panel: 0 1px 2px rgba(16, 20, 24, 0.05), 0 16px 32px -24px rgba(16, 20, 24, 0.28);
+  --app-scrim: none;
+
+  --app-tile-ring: rgba(16, 20, 24, 0.09);
+}
+
+html[data-theme='dark'] {
+  --app-bg: #0d1013;
+  --app-ink: #f0f2f4;
+  --app-muted: #b0b8c0;
+  --app-faint: #8b959e;
+
+  --app-rule: rgba(255, 255, 255, 0.18);
+  --app-rule-strong: rgba(255, 255, 255, 0.34);
+  --app-surface: rgba(255, 255, 255, 0.06);
+  --app-surface-border: rgba(255, 255, 255, 0.12);
+  --app-blur: blur(8px);
+
+  --app-accent: #ff8a76;
+  --app-accent-ink: #ffa898;
+  --app-accent-soft: rgba(255, 138, 118, 0.14);
+  --app-on-accent: #1a0d0a;
+
+  --app-shadow-text: none;
+  --app-shadow-panel: 0 1px 2px rgba(0, 0, 0, 0.4), 0 18px 36px -26px rgba(0, 0, 0, 0.8);
+  --app-scrim: none;
+
+  --app-tile-ring: rgba(255, 255, 255, 0.16);
+}
+
+/* 图版：满幅照片当主体，UI 全透明浮在上面。写在两套主题之后，
+   因此 data-ground='photo' 时无条件覆盖主题色——照片上只有「白字 + 阴影」一种读法。 */
+html[data-ground='photo'] {
+  --app-bg: #0b0e11;
+  --app-ink: #ffffff;
+  --app-muted: rgba(255, 255, 255, 0.78);
+  --app-faint: rgba(255, 255, 255, 0.6);
+
+  --app-rule: rgba(255, 255, 255, 0.26);
+  --app-rule-strong: rgba(255, 255, 255, 0.5);
+  --app-surface: rgba(10, 14, 18, 0.32);
+  --app-surface-border: rgba(255, 255, 255, 0.18);
+  --app-blur: blur(18px) saturate(1.5);
+
+  --app-accent: #ff9d8b;
+  --app-accent-ink: #ffb4a6;
+  --app-accent-soft: rgba(255, 157, 139, 0.16);
+  --app-on-accent: #1a0d0a;
+
+  /* 白字压在照片上必须带阴影，否则边缘会糊进高光里 */
+  --app-shadow-text: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 24px rgba(0, 0, 0, 0.3);
+  --app-shadow-panel: 0 1px 0 rgba(255, 255, 255, 0.08) inset, 0 18px 40px -28px rgba(0, 0, 0, 0.9);
+
+  /* 顶底压暗保文字，中段几乎不压，让照片本身说话 */
+  --app-scrim: linear-gradient(
+    180deg,
+    rgba(8, 11, 14, 0.82) 0%,
+    rgba(8, 11, 14, 0.48) 20%,
+    rgba(8, 11, 14, 0.18) 44%,
+    rgba(8, 11, 14, 0.44) 70%,
+    rgba(8, 11, 14, 0.86) 100%
+  );
+
+  --app-tile-ring: rgba(255, 255, 255, 0.55);
+}
+
+/* 同一张照片下的两档气氛：浅色压得轻、玻璃偏亮，暗色压得重、玻璃偏暗。
+   文字两档都是白字，切换主题不会破坏可读性，只改变明暗情绪。 */
+html[data-ground='photo'][data-theme='light'] {
+  --app-surface: rgba(12, 16, 20, 0.22);
+  --app-surface-border: rgba(255, 255, 255, 0.22);
+}
+
+html[data-ground='photo'][data-theme='dark'] {
+  --app-bg: #07090b;
+  --app-muted: rgba(255, 255, 255, 0.72);
+  --app-faint: rgba(255, 255, 255, 0.54);
+  --app-surface: rgba(6, 9, 12, 0.44);
+  --app-surface-border: rgba(255, 255, 255, 0.14);
+  --app-scrim: linear-gradient(
+    180deg,
+    rgba(6, 9, 12, 0.82) 0%,
+    rgba(6, 9, 12, 0.52) 24%,
+    rgba(6, 9, 12, 0.38) 46%,
+    rgba(6, 9, 12, 0.66) 74%,
+    rgba(6, 9, 12, 0.92) 100%
+  );
+}
+
+/* ================================================================ metrics = */
+:root {
+  --app-font-sans:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB',
+    'Microsoft YaHei', sans-serif;
+  /* Latin 先走 Georgia，CJK 逐字回退到宋体，不加载 webfont */
+  --app-font-serif:
+    Georgia, 'Iowan Old Style', 'Times New Roman', 'Songti SC', 'STSong', 'Noto Serif CJK SC',
+    SimSun, serif;
+  --app-font-num:
+    ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;
+
+  /* 字号阶梯：最大与最小要拉到 10:1，报纸头版靠的是悬殊而不是精致。
+     正文 17px 起步——被称赞的个人站里 13px 只用于 meta，11px 根本不存在。
+     展示级字号一律再加一道 svh 上限：屏幕一矮就整体缩字，正文与 micro 不参与，
+     这样「一屏看完」是靠缩标题实现的，而不是把 17px 正文压成 13px。 */
+  --app-text-hero: clamp(3.25rem, min(8.4vw, 12svh), 6.5rem);
+  --app-text-display: clamp(2rem, min(3.9vw, 5svh), 3.5rem);
+  --app-text-nameplate: clamp(2.25rem, min(4.6vw, 5.5svh), 3.5rem);
+  --app-text-figure: clamp(1.75rem, min(2.6vw, 3.6svh), 2.5rem);
+  --app-text-title: 1.1875rem;
+  --app-text-body: 1.0625rem;
+  --app-text-meta: 0.8125rem;
+  --app-text-micro: 0.75rem;
+
+  --app-leading-display: 1.28;
+  --app-leading-body: 1.6;
+
+  --app-page: 80rem;
+  --app-rail: 22rem;
+  --app-gutter: clamp(1.25rem, 4vw, 3.5rem);
+  --app-gap: clamp(1.5rem, 3vw, 3rem);
+  /* 纵向留白同样跟着屏高收：800px 高的笔记本比 1400px 高的显示器少一半气口 */
+  --app-space-block: min(2.75rem, 3svh);
+  --app-space-col: min(2rem, 2.1svh);
+  --app-space-head: min(1.25rem, 1.4svh);
+  --app-radius: 14px;
+  --app-radius-sm: 12px;
+  --app-radius-xs: 8px;
+
+  /* spring 曲线用于入场：ease-out 收尾太软，落位要有「咔哒」一下 */
+  --app-ease-spring: linear(
+    0,
+    0.007,
+    0.029 2.2%,
+    0.118 4.7%,
+    0.956 15.2%,
+    1.156 18.4%,
+    1.24 21.5%,
+    1.213 24.4%,
+    1.013 34.5%,
+    0.969 40.7%,
+    0.995 52.4%,
+    1
+  );
+}
+
+/* ============================================================= theme map == */
+@theme inline {
+  --color-ink: var(--app-ink);
+  --color-muted: var(--app-muted);
+  --color-faint: var(--app-faint);
+  --color-rule: var(--app-rule);
+  --color-accent: var(--app-accent);
+  --color-accent-ink: var(--app-accent-ink);
+  --color-accent-soft: var(--app-accent-soft);
+  --color-on-accent: var(--app-on-accent);
+  --color-surface: var(--app-surface);
+
+  --font-sans: var(--app-font-sans);
+  --font-serif: var(--app-font-serif);
+  --font-num: var(--app-font-num);
+
+  --text-hero: var(--app-text-hero);
+  --text-hero--line-height: 0.92;
+  --text-display: var(--app-text-display);
+  --text-display--line-height: var(--app-leading-display);
+  --text-figure: var(--app-text-figure);
+  --text-figure--line-height: 1;
+  --text-title: var(--app-text-title);
+  --text-title--line-height: 1.5;
+  --text-body: var(--app-text-body);
+  --text-body--line-height: var(--app-leading-body);
+  --text-meta: var(--app-text-meta);
+  --text-micro: var(--app-text-micro);
+
+  --radius-panel: var(--app-radius);
+  --radius-md: var(--app-radius-sm);
+  --radius-sm: var(--app-radius-xs);
+
+  --shadow-panel: var(--app-shadow-panel);
+}
+
+/* ================================================================== base == */
+@layer base {
+  html,
+  body,
+  #root {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+
+  body {
+    background-color: var(--app-bg);
+    color: var(--app-ink);
+    font-family: var(--app-font-sans);
+    font-size: var(--app-text-body);
+    line-height: var(--app-leading-body);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* 印刷颗粒：140px 去饱和噪声平铺。图版上不叠，否则会污染照片。 */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+  }
+
+  html[data-theme='dark'] body::after {
+    opacity: 0.05;
+  }
+
+  html[data-ground='photo'] body::after {
+    opacity: 0;
+  }
+
+  /* 只过渡颜色，不过渡布局属性，避免切主题时重排 */
+  body,
+  header,
+  footer,
+  main,
+  section,
+  div,
+  a,
+  button,
+  input {
+    transition:
+      background-color 0.22s ease,
+      border-color 0.22s ease,
+      color 0.22s ease;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--app-accent);
+    outline-offset: 2px;
+    border-radius: var(--app-radius-xs);
+  }
+
+  ::selection {
+    background: var(--app-accent);
+    color: var(--app-on-accent);
+  }
+
+  button {
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--app-rule-strong);
+    border: 3px solid transparent;
+    background-clip: content-box;
+    border-radius: 8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* ============================================================ components == */
+@layer components {
+  .page {
+    width: 100%;
+    max-width: var(--app-page);
+    margin-inline: auto;
+    padding-inline: var(--app-gutter);
+  }
+
+  .reveal {
+    animation: rise 0.7s var(--app-ease-spring) both;
+    animation-delay: var(--rise-delay, 0ms);
+  }
+
+  /* 墨色下划线链接：hover 时线从 0 拉到满，比换底色更像报纸 */
+  .ink-link {
+    color: var(--app-muted);
+    background-image: linear-gradient(var(--app-accent), var(--app-accent));
+    background-repeat: no-repeat;
+    background-position: 0 100%;
+    background-size: 0% 1px;
+    transition:
+      color 0.2s ease,
+      background-size 0.25s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--app-ink);
+      background-size: 100% 1px;
+    }
+  }
+
+  /* ---------------------------------------------------------------- 版面底 -- */
+  .ground {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background-color: var(--app-bg);
+  }
+
+  .ground-photo {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    /* 照片就绪后淡入，硬切会像页面跳了一下 */
+    animation: ground-in 1.1s ease-out both;
+  }
+
+  /* 遮罩单独一层：照片保持满饱和，压暗只发生在顶底 */
+  .ground-scrim {
+    background-image: var(--app-scrim);
+  }
+
+  /* ---------------------------------------------------------------- 规线 -- */
+  .hairline {
+    border-top: 1px solid var(--app-rule);
+  }
+
+  /* 粗规线：左端起一段套色再转中性，给规线一个「有设计」的起笔 */
+  .rule-heavy {
+    height: 2px;
+    background: linear-gradient(
+      90deg,
+      var(--app-accent) 0,
+      var(--app-accent) 6rem,
+      var(--app-rule-strong) 6rem,
+      var(--app-rule-strong) 100%
+    );
+  }
+
+  /* ---------------------------------------------------------------- 文字 -- */
+  /* 眉标：报眼里的小字，全靠字距撑开，是报纸最标志性的声音 */
+  .kicker {
+    font-size: var(--app-text-micro);
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--app-accent-ink);
+    font-weight: 500;
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .nameplate {
+    font-family: var(--app-font-serif);
+    font-size: var(--app-text-nameplate);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    color: var(--app-ink);
+    font-weight: 500;
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .dateline {
+    font-size: var(--app-text-meta);
+    letter-spacing: 0.03em;
+    color: var(--app-muted);
+    text-shadow: var(--app-shadow-text);
+  }
+
+  /* 超大时钟：整页的第一视觉锚点，细体大字，不装进任何面板 */
+  .hero-clock {
+    font-size: var(--app-text-hero);
+    font-weight: 200;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    font-variant-numeric: tabular-nums;
+    color: var(--app-ink);
+    text-shadow: var(--app-shadow-text);
+  }
+
+  /* 秒数缩到 0.38em 并走套色：保住到秒的信息，又不让八位数字压垮字形 */
+  .hero-clock-seconds {
+    font-size: 0.38em;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--app-accent-ink);
+    margin-inline-start: 0.12em;
+  }
+
+  /* 引言字体栈 Georgia → 系统宋体；中文没有词间空隙，行高要比拉丁文松 */
+  .quote {
+    font-family: var(--app-font-serif);
+    font-size: var(--app-text-display);
+    line-height: var(--app-leading-display);
+    letter-spacing: 0.005em;
+    color: var(--app-ink);
+    /* balance 而不是 pretty：中文没有词间空隙，pretty 会把「地方。」甩成孤行 */
+    text-wrap: balance;
+    max-width: 26ch;
+    /* 悬挂标点：让首字与版心对齐，而不是被 “ 推右半个字 */
+    text-indent: -0.4em;
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .greeting {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: var(--app-text-meta);
+    color: var(--app-muted);
+    letter-spacing: 0.06em;
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .greeting::before {
+    content: '';
+    width: 2px;
+    height: 0.9em;
+    background: var(--app-accent);
+  }
+
+  /* 面板：只在确实需要「一块实体」时用，靠描边+模糊而不是阴影堆叠 */
+  .panel {
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-surface-border);
+    border-radius: var(--app-radius);
+    backdrop-filter: var(--app-blur);
+    box-shadow: var(--app-shadow-panel);
+  }
+
+  .progress {
+    height: 2px;
+    border-radius: 999px;
+    overflow: hidden;
+    background-color: var(--app-rule);
+
+    & > i {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background-color: var(--app-accent);
+      transition: width 0.5s ease-out;
+    }
+  }
+
+  /* ---------------------------------------------------------------- 等待态 -- */
+  /* 顶边一道套色细线：不占版面也不挡内容，只说明接口还在跑 */
+  .loadbar {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 30;
+    height: 2px;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+
+    &[data-busy] {
+      opacity: 1;
+    }
+
+    & > i {
+      position: absolute;
+      inset-block: 0;
+      width: 36%;
+      background-image: linear-gradient(
+        90deg,
+        transparent,
+        var(--app-accent) 35%,
+        var(--app-accent) 65%,
+        transparent
+      );
+      animation: loadbar 1.15s cubic-bezier(0.6, 0.05, 0.35, 1) infinite;
+    }
+  }
+
+  /* 占位块：位置先占住，数据到达时版面不凭空长出一截 */
+  .skeleton {
+    background-color: var(--app-rule);
+    animation: breathe 1.6s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loadbar > i,
+    .skeleton {
+      animation: none;
+      opacity: 0.75;
+    }
+
+    .loadbar > i {
+      width: 100%;
+    }
+  }
+
+  /* ------------------------------------------------------------------ 月历 -- */
+  .cal {
+    display: grid;
+    /* 平板上状态栏会横排成一行，7 列必须守住最小宽度，否则日期会挤成一团 */
+    grid-template-columns: repeat(7, minmax(1.75rem, 1fr));
+    gap: 1px;
+    font-size: var(--app-text-micro);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cal-head {
+    padding-bottom: 0.15rem;
+    text-align: center;
+    color: var(--app-faint);
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .cal-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* 六行的月历是状态栏最贵的一块，矮屏上先压行高，字号不动 */
+    height: min(1.55rem, max(1.125rem, 1.95svh));
+    border-radius: var(--app-radius-xs);
+    color: var(--app-muted);
+    text-shadow: var(--app-shadow-text);
+
+    &[data-out] {
+      color: var(--app-faint);
+      opacity: 0.5;
+    }
+
+    &[data-today] {
+      background-color: var(--app-accent);
+      color: var(--app-on-accent);
+      font-weight: 600;
+      text-shadow: none;
+    }
+  }
+
+  .num {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
+  .text-shadowed {
+    text-shadow: var(--app-shadow-text);
+  }
+
+  /* ---------------------------------------------------------------- 控件 -- */
+  .seg {
+    display: inline-flex;
+    padding: 2px;
+    gap: 2px;
+    background-color: var(--app-surface);
+    border: 1px solid var(--app-surface-border);
+    border-radius: 999px;
+    backdrop-filter: var(--app-blur);
+  }
+
+  .seg-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: var(--app-text-micro);
+    color: var(--app-faint);
+
+    &:hover {
+      color: var(--app-ink);
+    }
+
+    &[aria-pressed='true'] {
+      background-color: var(--app-accent);
+      color: var(--app-on-accent);
+      font-weight: 500;
+    }
+  }
+
+  .switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: var(--app-text-micro);
+    color: var(--app-muted);
+
+    &:hover {
+      color: var(--app-ink);
+    }
+  }
+
+  .switch-track {
+    position: relative;
+    width: 28px;
+    height: 16px;
+    flex-shrink: 0;
+    border-radius: 999px;
+    background-color: var(--app-rule-strong);
+    transition: background-color 0.22s ease;
+  }
+
+  .switch-knob {
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: #fff;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+  }
+
+  .switch[aria-pressed='true'] {
+    color: var(--app-ink);
+
+    & .switch-track {
+      background-color: var(--app-accent);
+    }
+
+    & .switch-knob {
+      transform: translateX(12px);
+    }
+  }
+
+  .icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid var(--app-surface-border);
+    background-color: var(--app-surface);
+    color: var(--app-muted);
+    backdrop-filter: var(--app-blur);
+
+    &:hover:not(:disabled) {
+      color: var(--app-ink);
+      border-color: var(--app-rule-strong);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+
+  .icon-btn-primary {
+    width: 38px;
+    height: 38px;
+    color: var(--app-on-accent);
+    background-color: var(--app-accent);
+    border-color: transparent;
+    backdrop-filter: none;
+
+    &:hover:not(:disabled) {
+      color: var(--app-on-accent);
+      background-color: var(--app-accent-ink);
+    }
+  }
+
+  .text-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.4rem;
+    border-radius: var(--app-radius-xs);
+    font-size: var(--app-text-micro);
+    color: var(--app-muted);
+    text-shadow: var(--app-shadow-text);
+
+    &:hover:not(:disabled) {
+      color: var(--app-ink);
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+
+  /* ---------------------------------------------------------------- 快捷入口 -- */
+  /* 图标砖：favicon 压在主色底上，比文字列表可扫，也比方块卡片轻 */
+  .link-tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0.25rem 0.4rem;
+    border-radius: var(--app-radius-sm);
+    border: 1px solid transparent;
+    color: var(--app-muted);
+    transition:
+      background-color 0.18s ease,
+      border-color 0.18s ease,
+      transform 0.18s ease;
+
+    &:hover,
+    &:focus-visible {
+      color: var(--app-ink);
+      background-color: var(--app-surface);
+      border-color: var(--app-surface-border);
+      backdrop-filter: var(--app-blur);
+      transform: translateY(-2px);
+    }
+  }
+
+  .link-badge {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    overflow: hidden;
+    /* favicon 是按浏览器工具栏的白底设计的，压在任何饱和色上都会打架；
+       底板一律走浅色，品牌色改用外发光，既保住彩色又不会出现白方块 */
+    background-color: #f6f5f1;
+    box-shadow:
+      0 0 0 1px var(--app-tile-ring) inset,
+      0 8px 20px -12px color-mix(in oklab, var(--brand, #000) 95%, transparent);
+    transition: transform 0.22s cubic-bezier(0.2, 0.8, 0.3, 1);
+
+    .link-tile:hover &,
+    .link-tile:focus-visible & {
+      transform: translateY(-2px) scale(1.05);
+    }
+  }
+
+  /* favicon 取不到时留在下面当兜底，不额外写一套空状态 */
+  .link-mark {
+    position: absolute;
+    inset: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--app-font-serif);
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--brand, var(--app-accent));
+    letter-spacing: -0.02em;
+  }
+
+  .link-icon {
+    position: relative;
+    z-index: 1;
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+  }
+
+  .link-name {
+    font-size: var(--app-text-meta);
+    color: var(--app-ink);
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    text-shadow: var(--app-shadow-text);
+  }
+
+  .group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: var(--app-text-micro);
+    letter-spacing: 0.18em;
+    color: var(--app-faint);
+    text-shadow: var(--app-shadow-text);
+
+    &::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background-color: var(--app-rule);
+    }
+  }
+}
+
+@keyframes ground-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes loadbar {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(300%);
+  }
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+/* 入场：版面自上而下依次落位，用 --rise-delay 排节奏 */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import gzipPlugin from 'vite-plugin-compression';
 import path from 'path';
 import { createHtmlPlugin } from 'vite-plugin-html';
@@ -10,6 +11,7 @@ export default ({ mode }: { mode: string }) => {
   const isDev = mode === 'dev';
 
   const plugins = [
+    tailwindcss(),
     react(),
     !isDev &&
       gzipPlugin({
@@ -37,7 +39,7 @@ export default ({ mode }: { mode: string }) => {
     },
     base: env.VITE_SECONDARY_PATH || '/',
     build: {
-      minify: false,
+      minify: true,
       outDir: 'dist',
       assetsInlineLimit: 100 * 1024,
     },

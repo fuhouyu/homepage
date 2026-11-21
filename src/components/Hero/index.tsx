@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import { Button, Tag, Tooltip } from 'antd';
-import { SoundOutlined, SyncOutlined } from '@ant-design/icons';
 import { useEffect, useState } from 'react';
-import { SectionLabel } from '@/styles/style';
-import { QuoteActions, QuoteFooter, QuoteText, QuoteTitle, QuoteWrap } from './style';
+import { Icon } from '@/components/Icon';
 import siteConfig from '@/assets/site-config.json';
 import quoteBank from '@/assets/daily-quotes.json';
 import { fetchJson } from '@/utils/request';
+import { dayOfYear } from '@/utils/date';
 
 interface Quote {
   text: string;
@@ -76,18 +74,10 @@ const resolveList = (data: unknown): unknown => {
   return undefined;
 };
 
-/** 一年中的第几天，保证同一天刷新始终是同一句。 */
-const dayOfYear = () => {
-  const now = new Date();
-  const start = Date.UTC(now.getFullYear(), 0, 0);
-  const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
-  return Math.floor((today - start) / 86400000);
-};
-
 const localQuotes = quoteBank.quotes.filter(isQuote);
 const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window;
 
-export const DailyQuote = () => {
+export const Hero = () => {
   const [offset, setOffset] = useState(0);
   const [remote, setRemote] = useState<Quote | null>(null);
   const [loading, setLoading] = useState(false);
@@ -141,42 +131,34 @@ export const DailyQuote = () => {
   if (!current) return null;
 
   return (
-    <QuoteWrap>
-      <QuoteTitle>
-        <SectionLabel>{siteConfig.dailyQuote.title}</SectionLabel>
-        <QuoteActions>
-          <Tooltip title="朗读" arrow={false}>
-            <Button
-              type="text"
-              size="small"
-              icon={<SoundOutlined />}
-              onClick={speak}
-              disabled={!canSpeak}
-              aria-label="朗读这句"
-            />
-          </Tooltip>
-          <Tooltip title="换一条" arrow={false}>
-            <Button
-              type="text"
-              size="small"
-              icon={<SyncOutlined spin={loading} />}
-              onClick={() => setOffset((value) => value + 1)}
-              aria-label="换一条"
-            />
-          </Tooltip>
-        </QuoteActions>
-      </QuoteTitle>
+    <section className="flex flex-col gap-3.5 md:gap-4">
+      {/* 控制按钮跟着栏标走，不与句末署名隔着一整块版面 */}
+      <div className="flex items-center justify-between gap-6">
+        <h2 className="kicker">每日一言</h2>
+        <div className="flex items-center gap-1.5">
+          <button type="button" className="text-btn" onClick={speak} disabled={!canSpeak}>
+            <Icon name="speaker" size={13} />
+            朗读
+          </button>
+          <button
+            type="button"
+            className="text-btn"
+            onClick={() => setOffset((value) => value + 1)}
+            disabled={loading}
+          >
+            <Icon name="shuffle" size={13} />
+            换一条
+          </button>
+        </div>
+      </div>
 
-      <QuoteText>“{current.text}”</QuoteText>
+      <blockquote className="quote">“{current.text}”</blockquote>
 
-      <QuoteFooter>
-        <span className="from">— {current.from || '佚名'}</span>
-        {current.tag && (
-          <Tag className="tag" color="default">
-            {current.tag}
-          </Tag>
-        )}
-      </QuoteFooter>
-    </QuoteWrap>
+      <p className="text-shadowed flex flex-wrap items-center gap-x-3 gap-y-1.5 text-meta text-muted">
+        <span aria-hidden className="bg-rule h-px w-10 shrink-0" />
+        <span>{current.from || '佚名'}</span>
+        {current.tag ? <span className="text-faint">· {current.tag}</span> : null}
+      </p>
+    </section>
   );
 };

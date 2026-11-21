@@ -13,35 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import React from 'react';
-import * as Icons from '@ant-design/icons';
-import { SectionLabel } from '@/styles/style';
-import {
-  NavCardStyled,
-  NavGroup,
-  NavGroupHead,
-  NavIcon,
-  NavItem,
-  NavItems,
-  NavText,
-} from './style';
+import type { CSSProperties } from 'react';
 import siteConfig from '@/assets/site-config.json';
 
 interface NavItemConfig {
   name: string;
   url: string;
   envKey?: string;
-  icon: string;
   desc: string;
-  tone: string;
+  tone?: string;
 }
 
 interface NavGroupConfig {
   title: string;
   items: NavItemConfig[];
 }
-
-type IconName = keyof typeof Icons;
 
 const groups: NavGroupConfig[] = siteConfig.navigation;
 
@@ -53,43 +39,69 @@ const envUrls: Record<string, string | undefined> = {
   email: email ? `mailto:${email}` : undefined,
 };
 
-export const NavigationCard: React.FC = () => (
-  <NavCardStyled variant="borderless">
-    <SectionLabel>快捷入口 · LINKS</SectionLabel>
+/** 首字母 / 首字作标记，favicon 取不到时它就是图标本身，不额外做空状态 */
+const markOf = (name: string) => name.trim().charAt(0).toUpperCase();
 
+/** 直接取站点自己的 favicon，不引第三方图标服务；mailto 与解析失败都落到首字母 */
+const faviconOf = (href: string) => {
+  try {
+    const { protocol, hostname } = new URL(href);
+    if (!protocol.startsWith('http')) return '';
+    return `https://${hostname}/favicon.ico`;
+  } catch {
+    return '';
+  }
+};
+
+export const Navigation = () => (
+  <section
+    className="grid gap-y-[var(--app-space-col)] lg:grid-cols-2 lg:gap-x-12"
+    aria-label="快捷入口"
+  >
     {groups.map((group) => (
-      <NavGroup key={group.title}>
-        <NavGroupHead>
-          <span className="title">{group.title}</span>
-          <span className="count">{String(group.items.length).padStart(2, '0')}</span>
-        </NavGroupHead>
-        <NavItems>
+      <div key={group.title} className="flex flex-col gap-3">
+        <h2 className="group-title">{group.title}</h2>
+
+        {/* 固定砖宽 + 换行：列数随分组宽度变化，5 个站点就是一行，不会再掉出孤零零的第二排 */}
+        <ul className="flex flex-wrap gap-1.5">
           {group.items.map((item) => {
-            const IconComponent =
-              (Icons[item.icon as IconName] as React.ElementType) || Icons.GlobalOutlined;
             const href = (item.envKey && envUrls[item.envKey]) || item.url;
             const isMail = href.startsWith('mailto:');
+            const icon = faviconOf(href);
 
             return (
-              <NavItem
-                key={`${group.title}-${item.name}`}
-                href={href}
-                target={isMail ? undefined : '_blank'}
-                rel={isMail ? undefined : 'noreferrer'}
-                aria-label={`${item.name} · ${item.desc}`}
-              >
-                <NavIcon $tone={item.tone}>
-                  <IconComponent />
-                </NavIcon>
-                <NavText>
-                  <span className="name">{item.name}</span>
-                  <span className="desc">{item.desc}</span>
-                </NavText>
-              </NavItem>
+              <li key={item.name} className="w-[5.75rem]">
+                <a
+                  className="link-tile"
+                  href={href}
+                  title={item.desc}
+                  style={{ '--brand': item.tone } as CSSProperties}
+                  {...(isMail ? {} : { target: '_blank', rel: 'noreferrer' })}
+                >
+                  <span aria-hidden className="link-badge">
+                    <span className="link-mark">{markOf(item.name)}</span>
+                    {icon ? (
+                      <img
+                        src={icon}
+                        alt=""
+                        width={24}
+                        height={24}
+                        loading="lazy"
+                        decoding="async"
+                        onError={(event) => {
+                          event.currentTarget.style.display = 'none';
+                        }}
+                        className="link-icon"
+                      />
+                    ) : null}
+                  </span>
+                  <span className="link-name">{item.name}</span>
+                </a>
+              </li>
             );
           })}
-        </NavItems>
-      </NavGroup>
+        </ul>
+      </div>
     ))}
-  </NavCardStyled>
+  </section>
 );

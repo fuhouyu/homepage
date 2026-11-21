@@ -257,7 +257,6 @@ bower_components
 psd
 thumb
 sketch
-*.css
 
 # WorkBuddy project data (memory logs, local previews)
 .workbuddy/

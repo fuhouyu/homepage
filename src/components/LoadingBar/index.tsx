@@ -13,21 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import styled from 'styled-components';
+import { useSyncExternalStore } from 'react';
+import { getNetworkPending, subscribeNetwork } from '@/utils/request';
 
-export const PageGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-  align-items: stretch;
+/**
+ * 报头上方一道跑动的套色细线：每日一图可能要十几秒，没有它这段等待就像页面卡死。
+ * 不抢版面、不挡内容，请求清空后自己收掉。
+ */
+export const LoadingBar = () => {
+  const busy = useSyncExternalStore(subscribeNetwork, getNetworkPending, () => 0) > 0;
 
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-`;
-
-export const FullWidth = styled.div`
-  grid-column: 1 / -1;
-  min-width: 0;
-`;
+  return (
+    <div aria-hidden className="loadbar" data-busy={busy || undefined}>
+      <i />
+    </div>
+  );
+};

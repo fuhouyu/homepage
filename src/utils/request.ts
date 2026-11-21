@@ -16,6 +16,38 @@
 
 const DEFAULT_TIMEOUT = 6000;
 
+/* 在途请求数：首屏三四个接口各自到达的时间差很多，版面需要一个统一的「还在跑」信号 */
+let pending = 0;
+const listeners = new Set<() => void>();
+const settle = () => {
+  pending = Math.max(0, pending - 1);
+  listeners.forEach((notify) => notify());
+};
+const start = () => {
+  pending += 1;
+  listeners.forEach((notify) => notify());
+};
+
+export const getNetworkPending = () => pending;
+
+export const subscribeNetwork = (notify: () => void) => {
+  listeners.add(notify);
+  return () => {
+    listeners.delete(notify);
+  };
+};
+
+const request = async (url: string, signal: AbortSignal): Promise<Response> => {
+  start();
+  try {
+    const response = await fetch(url, { signal });
+    if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+    return response;
+  } finally {
+    settle();
+  }
+};
+
 const withTimeout = (timeout: number) =>
   typeof AbortSignal.timeout === 'function'
     ? AbortSignal.timeout(timeout)
@@ -26,13 +58,11 @@ const withTimeout = (timeout: number) =>
       })();
 
 export const fetchJson = async <T>(url: string, timeout = DEFAULT_TIMEOUT): Promise<T> => {
-  const response = await fetch(url, { signal: withTimeout(timeout) });
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+  const response = await request(url, withTimeout(timeout));
   return (await response.json()) as T;
 };
 
 export const fetchText = async (url: string, timeout = DEFAULT_TIMEOUT): Promise<string> => {
-  const response = await fetch(url, { signal: withTimeout(timeout) });
-  if (!response.ok) throw new Error(`Request failed: ${response.status}`);
+  const response = await request(url, withTimeout(timeout));
   return response.text();
 };

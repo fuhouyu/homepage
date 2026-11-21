@@ -17,15 +17,28 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8"/>
+    <script>
+        // 首屏绘制前落主题，避免暗色模式下先闪一次浅色
+        try {
+            if (localStorage.getItem('fuhouyu-app-mode') === 'dark') {
+                document.documentElement.dataset.theme = 'dark';
+            }
+        } catch (e) {
+            /* 隐私模式下保持默认浅色 */
+        }
+    </script>
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <meta content="light dark" name="color-scheme"/>
     <link href="/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180">
     <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png">
     <link href="/favicon-16x16.png" rel="icon" sizes="16x16" type="image/png">
+    <link href="/favicon.ico" rel="icon" sizes="any" type="image/x-icon">
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml">
     <meta content="%VITE_SITE_DES%" name="description"/>
     <meta content="%VITE_SITE_KEYWORDS%" name="keywords"/>
     <meta content="%VITE_SITE_AUTHOR%" name="author"/>
-    <meta content="#F4F6F2" name="theme-color"/>
+    <meta content="#FAFAF7" media="(prefers-color-scheme: light)" name="theme-color"/>
+    <meta content="#101311" media="(prefers-color-scheme: dark)" name="theme-color"/>
     <title>%VITE_SITE_NAME%</title>
 </head>
 <body>
