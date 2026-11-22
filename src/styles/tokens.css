@@ -365,17 +365,109 @@ html[data-ground='photo'][data-theme='dark'] {
     background-color: var(--app-bg);
   }
 
+  /* 照片与遮罩的可见性只认 data-ground：接口成功过就把图一直留在原地，
+     关掉开关时文字退回墨色、图却还亮着，就成了亮图压暗字。
+     进场慢、退场快，动画的 both 填充会把可见性钉死，所以走 transition */
   .ground-photo {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    /* 照片就绪后淡入，硬切会像页面跳了一下 */
-    animation: ground-in 1.1s ease-out both;
+    opacity: 0;
+    transition: opacity 0.45s ease-in;
   }
 
   /* 遮罩单独一层：照片保持满饱和，压暗只发生在顶底 */
   .ground-scrim {
     background-image: var(--app-scrim);
+    opacity: 0;
+    transition: opacity 0.45s ease-in;
+  }
+
+  html[data-ground='photo'] .ground-photo,
+  html[data-ground='photo'] .ground-scrim {
+    opacity: 1;
+    transition: opacity 1.1s ease-out;
+  }
+
+  /* ---------------------------------------------------------------- 启动态 -- */
+  /* 进站先播一段装配：底色就是当前那套底的地色，第一帧不会闪白。
+     遮罩在场时 html[data-booting] 把 .reveal 挂起，遮罩抬起后版面才落位。 */
+  .boot {
+    position: fixed;
+    inset: 0;
+    z-index: 40;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    background-color: var(--app-bg);
+    transition:
+      opacity 0.36s ease,
+      transform 0.36s ease;
+  }
+
+  .boot[data-phase='lift'] {
+    opacity: 0;
+    transform: translateY(-1.2%);
+    pointer-events: none;
+  }
+
+  .boot-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.85rem;
+  }
+
+  .boot-mark {
+    font-family: var(--app-font-serif);
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1;
+    letter-spacing: -0.015em;
+    color: var(--app-ink);
+  }
+
+  /* 装配线从左端拉出，用的是版面同一根 spring 曲线 */
+  .boot-rule {
+    width: min(12rem, 44vw);
+    height: 2px;
+    background-color: var(--app-accent);
+    transform-origin: left center;
+    animation: boot-draw 0.52s var(--app-ease-spring) both;
+  }
+
+  .boot-note {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--app-font-num);
+    font-size: var(--app-text-micro);
+    letter-spacing: 0.22em;
+    color: var(--app-faint);
+  }
+
+  .boot-caret {
+    width: 0.5em;
+    height: 1em;
+    background-color: var(--app-accent);
+    animation: boot-blink 1s steps(1) infinite;
+  }
+
+  /* 一道扫描线横穿整屏，只走一次 */
+  .boot-scan {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 34vw;
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--app-accent) 16%, transparent),
+      transparent
+    );
+    animation: boot-scan 0.9s ease-out both;
+  }
+
+  html[data-booting] .reveal {
+    animation-play-state: paused;
   }
 
   /* ---------------------------------------------------------------- 规线 -- */
@@ -832,15 +924,6 @@ html[data-ground='photo'][data-theme='dark'] {
   }
 }
 
-@keyframes ground-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 @keyframes loadbar {
   from {
     transform: translateX(-100%);
@@ -861,6 +944,40 @@ html[data-ground='photo'][data-theme='dark'] {
 }
 
 /* 入场：版面自上而下依次落位，用 --rise-delay 排节奏 */
+@keyframes boot-draw {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes boot-blink {
+  0%,
+  50% {
+    opacity: 1;
+  }
+  50.01%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes boot-scan {
+  from {
+    transform: translateX(-40vw);
+    opacity: 0;
+  }
+  30% {
+    opacity: 1;
+  }
+  to {
+    transform: translateX(115vw);
+    opacity: 0;
+  }
+}
+
 @keyframes rise {
   from {
     opacity: 0;
@@ -870,4 +987,11 @@ html[data-ground='photo'][data-theme='dark'] {
     opacity: 1;
     transform: none;
   }
+}
+
+/* 浅暗切换是整页换色，视图转场把新旧两帧交叉淡入；不支持的浏览器直接瞬时切换 */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.42s;
+  animation-timing-function: ease;
 }

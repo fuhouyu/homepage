@@ -15,6 +15,10 @@
  */
 import { createRoot } from 'react-dom/client';
 import '@/styles/tokens.css';
+import { bootNeeded } from '@/components/Boot';
 import { App } from '@/App';
+
+/* 渲染前先把挂起标记立好：晚一帧，头版的落位就会在遮罩底下演完 */
+if (bootNeeded()) document.documentElement.dataset.booting = '';
 
 createRoot(document.getElementById('root')!).render(<App />);

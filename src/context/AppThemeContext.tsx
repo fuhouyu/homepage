@@ -14,11 +14,17 @@
  * limitations under the License.
  */
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { flushSync } from 'react-dom';
 
 export type AppMode = 'light' | 'dark';
 
 export const APP_MODE_STORAGE_KEY = 'fuhouyu-app-mode';
 export const WALLPAPER_STORAGE_KEY = 'fuhouyu-wallpaper-on';
+
+/** 视图转场是渐进增强：Chrome / Safari 有，其它浏览器直接落回瞬时切换 */
+type TransitionDocument = Document & {
+  startViewTransition?: (callback: () => void) => unknown;
+};
 
 const readStored = (key: string): string | null => {
   try {
@@ -47,11 +53,25 @@ interface AppThemeContextType {
 const AppThemeContext = createContext<AppThemeContextType | undefined>(undefined);
 
 export const AppThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [mode, setMode] = useState<AppMode>(() =>
+  const [mode, setModeState] = useState<AppMode>(() =>
     readStored(APP_MODE_STORAGE_KEY) === 'dark' ? 'dark' : 'light',
   );
   // 头版图默认打开：照片是这套版面的主体，只有明确关掉过才是关
   const [wallpaper, setWallpaper] = useState(() => readStored(WALLPAPER_STORAGE_KEY) !== 'off');
+
+  /* 三套底是整页换色，一帧切完会像闪了一下。视图转场负责交叉淡入，
+     但它要求 DOM 在回调里同步改完，所以状态更新走 flushSync。 */
+  const setMode = (next: AppMode) => {
+    const doc = document as TransitionDocument;
+    const apply = () => {
+      document.documentElement.dataset.theme = next;
+      writeStored(APP_MODE_STORAGE_KEY, next);
+      flushSync(() => setModeState(next));
+    };
+    const reduced = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (doc.startViewTransition && !reduced) doc.startViewTransition(apply);
+    else apply();
+  };
 
   useEffect(() => {
     document.documentElement.dataset.theme = mode;

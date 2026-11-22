@@ -22,6 +22,8 @@ interface NavItemConfig {
   envKey?: string;
   desc: string;
   tone?: string;
+  /** 由 scripts/resolve-nav-icons.mjs 解析并写回的源站图标地址 */
+  icon?: string;
 }
 
 interface NavGroupConfig {
@@ -42,12 +44,12 @@ const envUrls: Record<string, string | undefined> = {
 /** 首字母 / 首字作标记，favicon 取不到时它就是图标本身，不额外做空状态 */
 const markOf = (name: string) => name.trim().charAt(0).toUpperCase();
 
-/** 直接取站点自己的 favicon，不引第三方图标服务；mailto 与解析失败都落到首字母 */
-const faviconOf = (href: string) => {
+/** 配置里没有 icon 的新链接（含改了域名的）现推一个 origin 兜底，mailto 直接走首字母 */
+const originFallback = (href: string) => {
   try {
-    const { protocol, hostname } = new URL(href);
+    const { protocol, origin } = new URL(href);
     if (!protocol.startsWith('http')) return '';
-    return `https://${hostname}/favicon.ico`;
+    return `${origin}/favicon.ico`;
   } catch {
     return '';
   }
@@ -67,7 +69,7 @@ export const Navigation = () => (
           {group.items.map((item) => {
             const href = (item.envKey && envUrls[item.envKey]) || item.url;
             const isMail = href.startsWith('mailto:');
-            const icon = faviconOf(href);
+            const icon = item.icon || originFallback(href);
 
             return (
               <li key={item.name} className="w-[5.75rem]">
@@ -88,6 +90,7 @@ export const Navigation = () => (
                         height={24}
                         loading="lazy"
                         decoding="async"
+                        referrerPolicy="no-referrer"
                         onError={(event) => {
                           event.currentTarget.style.display = 'none';
                         }}

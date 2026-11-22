@@ -15,9 +15,11 @@
  */
 import { LayoutMain } from '@/layouts';
 import { AppThemeProvider } from '@/context/AppThemeContext';
+import { Boot } from '@/components/Boot';
 
 export const App = () => (
   <AppThemeProvider>
+    <Boot />
     <LayoutMain />
   </AppThemeProvider>
 );

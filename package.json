@@ -9,6 +9,8 @@
     "build": "tsc -b && vite build",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "nav:icons": "node scripts/resolve-nav-icons.mjs",
+    "nav:icons:check": "node scripts/resolve-nav-icons.mjs --check",
     "preview": "vite preview"
   },
   "dependencies": {
